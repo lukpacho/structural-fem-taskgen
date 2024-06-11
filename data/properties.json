@@ -1,0 +1,88 @@
+{
+  "materials": {
+    "steel": {"E": 200e6},
+    "iron": {"E": 190e6},
+    "aluminium": {"E": 70e6},
+    "glass": {"E": 50e6},
+    "concrete": {"E": 30e6},
+    "oak": {"E": 12e6}
+  },
+  "sections": {
+    "HEB120": {"A": 34, "I": 864},
+    "HEB160": {"A": 54, "I": 2492},
+    "HEB220": {"A": 91, "I": 8091},
+    "IPE120": {"A": 13, "I": 318},
+    "IPE180": {"A": 24, "I": 1320},
+    "IPE240": {"A": 39, "I": 3890},
+    "square10": {"A": 100, "I": 833.3},
+    "square15": {"A": 225, "I": 4218.8},
+    "square20": {"A": 400, "I": 13333.3},
+    "rectangle8x12": {"A": 96, "I": 1152},
+    "rectangle12x20": {"A": 240, "I": 8000},
+    "rectangle15x28": {"A": 420, "I": 27440},
+    "circle8": {"A": 78.5, "I": 490.9},
+    "circle12": {"A": 113.1, "I": 1017.9},
+    "circle16": {"A": 201.1, "I": 3217.0}
+  },
+  "loads": {
+    "P": [-50, -45, -40, -35, -30, -25, -20, -15, -10, -5, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
+    "M": [-20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+    "q": [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  },
+  "beam_configurations": {
+    "1": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "boundary_conditions": [1, 13]
+    },
+    "2": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [1],
+      "boundary_conditions": [1, 2, 6, 10]
+    },
+    "3": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [2],
+      "boundary_conditions": [1, 2, 10, 14]
+    },
+    "4": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [4],
+      "boundary_conditions": [1, 2, 5, 12]
+    },
+    "5": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [4],
+      "boundary_conditions": [1, 2, 5, 7, 14]
+    },
+    "6": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [3],
+      "boundary_conditions": [3, 5, 10, 14, 15]
+    },
+    "7": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [1],
+      "boundary_conditions": [1, 6, 10, 14]
+    },
+    "8": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [3],
+      "boundary_conditions": [1, 5, 10, 14]
+    },
+    "999": {
+      "n_elements": 6,
+      "lengths": [3.0, 4.0, 5.0],
+      "hinges" : [1],
+      "boundary_conditions": [1, 6, 10, 14]
+    }
+  }
+}
+
