@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from calfem.core import *
 from calfem.vis_mpl import *
+from config import BASE_DIR, cm
 
 
 def solve_beam(geometry, element_properties, loads):
@@ -11,18 +12,18 @@ def solve_beam(geometry, element_properties, loads):
     """
     ndofs = geometry['ndofs']
     nels = geometry['nels']
-    coord = geometry['coord']
-    dof = geometry['dof']
-    edof = geometry['edof']
-    bc = geometry['bc']
+    coord = np.array(geometry['coord'])
+    dof = np.array(geometry['dof'])
+    edof = np.array(geometry['edof'])
+    bc = np.array(geometry['bc'])
 
     # Initialize global stiffness matrix, force vector, and distributed load
     K = np.zeros((ndofs, ndofs))
     f = np.zeros((ndofs, 1))
 
     # Prepare arrays for element properties and distributed loads
-    ep = np.zeros((nels, 2))
-    eq = np.zeros((nels, 1))
+    ep = np.zeros((nels, 3))
+    eq = np.zeros((nels, 2))
 
     # Apply point loads and moments if they are specified
     if 'P_loc' in loads and 'P' in loads:
@@ -36,16 +37,18 @@ def solve_beam(geometry, element_properties, loads):
     if 'q_loc' in loads and 'q' in loads:
         if isinstance(loads['q_loc'], int):
             if 0 <= loads['q_loc'] < nels:
-                eq[loads['q_loc']] += loads['q']
+                eq[loads['q_loc']] += [0, loads['q']]
         elif isinstance(loads['q_loc'], list):
             if all(0 < q_loc < nels for q_loc in loads['q_loc']):
-                eq[loads['q_loc']] += loads['q']
+                for q_loc, q in zip(loads['q_loc'], loads['q']):
+                    eq[q_loc] += [0, q]
         else:
             raise TypeError('Unexpected type for q_loc. Expected int or list.')
 
     # Extract element properties
     for i in range(nels):
         ep[i] = [element_properties[i]['material']['E'],
+                 element_properties[i]['section']['A']*10**-4,
                  element_properties[i]['section']['I']*10**-8]
 
     # Extract element coordinates
@@ -53,7 +56,7 @@ def solve_beam(geometry, element_properties, loads):
 
     # Assemble system
     for i in range(nels):
-        Ke, fe = beam1e(ex[i], ep[i], eq[i])
+        Ke, fe = beam2e(ex[i], ey[i], ep[i], eq[i])
         assem(edof[i], K, Ke, f, fe)
 
     # Solve system
@@ -65,7 +68,7 @@ def solve_beam(geometry, element_properties, loads):
     max_results = {'ed': 0}
 
     for i in range(nels):
-        es, edi, eci = beam1s(ex[i], ep[i], ed[i], eq[i], 11)
+        es, edi, eci = beam2s(ex[i], ey[i], ep[i], ed[i], eq[i], 11)
         element_results[i] = {'es': es, 'edi': edi, 'eci': eci}
         current_max_displacement = np.max(np.abs(edi))
         max_results['ed'] = max(max_results['ed'], current_max_displacement)
@@ -73,51 +76,80 @@ def solve_beam(geometry, element_properties, loads):
     return a, ex, ey, element_results, max_results
 
 
-def plot_beam_results(ex, ey, element_results, max_results,
-                      beam_version_to_simulate, simulation_index):
+def plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, simulation_index=0):
     plt.rcParams.update({'font.size': 9})
+    simulation_data = [mode, beam_version, simulation_index]
     # Define offsets
-    offset_x = ex.max()/20
-    offset_y = 2
-    limit_x = [-offset_x, ex.max()+offset_x]
-    limit_y = [-offset_y, ey.max()+offset_y]
-
-    fig, axs = plt.subplots(3, 1, figsize=(6, 8))
+    # offset_x = ex.max()/20
+    # offset_y = 2
+    # limit_x = [-offset_x, ex.max()+offset_x]
+    # limit_y = [-offset_y, ey.max()+offset_y]
 
     # Plot displacements
-    axs[0].set_title('Displacements, cm')
-    plot_beam_displacements(axs[0], ex, ey, element_results, max_results,
-                            limit_x, limit_y)
+    fig, ax = plt.subplots(figsize=(16*cm, 8*cm))
+    plot_beam_displacements(ax, ex, ey, element_results, max_results)
+    manage_plot(simulation_data, fig, ax, 'Displacements, cm')
 
-    # Plot shear forces
+    # # Plot shear forces
     # axs[1].set_title('Shear Forces')
-    # plot_beam_shear_forces(axs[1], 'T', ex, ey, results, limits)
-
-    # Plot moments
+    # plot_beam_displacements(axs[0], ex, ey, element_results, max_results, limit_x, limit_y)
+    # # plot_beam_shear_forces(axs[1], 'T', ex, ey, results, limits)
+    #
+    # # Plot moments
     # axs[2].set_title('Moments')
-    # plot_beam_moments(axs[2], 'M', ex, ey, results, limits)
+    # plot_beam_displacements(axs[0], ex, ey, element_results, max_results, limit_x, limit_y)
+    # # plot_beam_moments(axs[2], 'M', ex, ey, results, limits)
+    #
+    # # Save the figures
+    # plt.tight_layout()
+    # plot_filename = f'{mode}_{beam_version}_{simulation_index}_results'
+    # plot_path = os.path.join(BASE_DIR, 'data', 'results', plot_filename)
+    # plt.savefig(plot_path + '.pdf')
+    # # plt.savefig(plot_path + '.png', dpi=1200)
+    # plt.show()
 
-    # Save the figures
-    plt.tight_layout()
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    results_name = f'{beam_version_to_simulate}_{simulation_index}_results'
-    results_path = os.path.join(current_dir, '..', 'data', 'results', results_name)
-    plt.savefig(results_path + '.pdf')
-    plt.savefig(results_path + '.png', dpi=1200)
-    plt.show()
+
+def manage_plot(simulation_data, fig, ax, title, save_format='png', show=True, tight_layout=True):
+    """
+    Manage the plotting operations like setting titles, saving, and displaying.
+
+    Args:
+        simulation_data (list): List containing mode, beam_version, and simulation_index
+        fig (matplotlib.figure.Figure): The figure object.
+        ax (matplotlib.axes.Axes): The axes object for the plot.
+        title (str): Title of the plot.
+        save_format (str): Format in which the plot will be saved ('png', 'pdf', etc.).
+        show (bool): Whether to display the plot.
+        tight_layout (bool): Whether to apply tight_layout to the figure.
+    """
+    if title:
+        ax.set_title(title)
+
+    if tight_layout:
+        plt.tight_layout()
+
+    if save_format:
+        plot_type = title.split(',')[0].lower()
+        plot_filename = '{}_{}_{}_{}'.format(*simulation_data, plot_type)
+        plot_path = os.path.join(BASE_DIR, 'data', 'results', plot_filename)
+        fig.savefig(plot_path + save_format, dpi=600)
+
+    if show:
+        plt.show()
+    else:
+        plt.close(fig)
+    pass
 
 
-def plot_beam_displacements(ax, ex, ey, element_results, max_results,
-                            limit_x, limit_y):
-    ax.set_xlim(limit_x)
-    ax.set_ylim(limit_y)
-    ax.axis('off')
-    # eldraw2(ex, ey, [2, 1, 0])  # [linetype linecolor nodemark]
+def plot_beam_displacements(ax, ex, ey, element_results, max_results):
     scale_factor = scalfact2(ex, ey, max_results['ed'], 0.3)
+    ax.set_title('Displacements, cm')
+    # ax.axis('off')
+    eldraw2(ex, ey, [2, 1, 0])  # Line type, line color, node mark
 
     for i, result in element_results.items():
         edi = result['edi']
-        eldisp2(ex[i], ey[i], edi, [1, 1, 1], scale_factor)
+        dispbeam2(ex[i], ey[i], edi, [1, 2, 3], scale_factor)
 
 
 def plot_results(geometry, results):

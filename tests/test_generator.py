@@ -13,17 +13,7 @@ class TestGenerator(unittest.TestCase):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         properties_path = os.path.join(current_dir, '..', 'data', 'properties.json')
         with open(properties_path, 'r') as file:
-            cls.properties = json.load(file)
-
-    def check_hinges(self, version, geometry):
-        # Verify that for each hinge in the properties, the corresponding
-        # nodes in the geometry actually share the specified DOFs
-        hinges_info = self.properties['beam_configurations'][str(version)]['hinges']
-        for hinge_index in hinges_info:
-            node1, node2 = hinge_index, hinge_index + 1
-            if geometry['dof'][node1][0] != geometry['dof'][node2][0]:
-                return False
-        return True
+            cls.properties = json.load(file)['random']
 
     def test_generate_geometry_detailed_checks(self):
         for version in self.properties['beam_configurations'].keys():
@@ -32,47 +22,43 @@ class TestGenerator(unittest.TestCase):
                 self.assertIsInstance(geometry, dict)
                 self.assertGreater(max_length, 0)
                 self.assertIn('coord', geometry)
-                if 'hinges' in self.properties['beam_configurations'][version]:
-                    self.assertTrue(self.check_hinges(version, geometry))
 
     def test_edof_generation_version_2(self):
-        version = '2'  # assuming versions are stored as strings in JSON
+        version = 'beam2'
         geometry, _ = generate_geometry(version, self.properties)
         expected_edof = [
-            [1, 1, 2, 3, 4],
-            [2, 3, 5, 6, 7],
-            [3, 6, 7, 8, 9],
-            [4, 8, 9, 10, 11],
-            [5, 10, 11, 12, 13],
-            [6, 12, 13, 14, 15],
+            [1, 2, 3, 4, 5, 6],
+            [4, 5, 22, 7, 8, 9],
+            [7, 8, 9, 10, 11, 12],
+            [10, 11, 12, 13, 14, 15],
+            [13, 14, 15, 16, 17, 18],
+            [16, 17, 18, 19, 20, 21],
         ]
         self.assertEqual(geometry['edof'].tolist(), expected_edof)
 
     def test_edof_generation_version_3(self):
-        version = '3'  # another version for testing
+        version = 'beam3'
         geometry, _ = generate_geometry(version, self.properties)
-        # Define expected edof based on version 3 configurations
         expected_edof = [
-            [1, 1, 2, 3, 4],
-            [2, 3, 4, 5, 6],
-            [3, 5, 7, 8, 9],
-            [4, 8, 9, 10, 11],
-            [5, 10, 11, 12, 13],
-            [6, 12, 13, 14, 15],
+            [1, 2, 3, 4, 5, 6],
+            [4, 5, 6, 7, 8, 9],
+            [7, 8, 22, 10, 11, 12],
+            [10, 11, 12, 13, 14, 15],
+            [13, 14, 15, 16, 17, 18],
+            [16, 17, 18, 19, 20, 21],
         ]
         self.assertEqual(geometry['edof'].tolist(), expected_edof)
 
     def test_edof_generation_version_8(self):
-        version = '8'  # another version for testing
+        version = 'beam8'
         geometry, _ = generate_geometry(version, self.properties)
-        # Define expected edof based on version 3 configurations
         expected_edof = [
-            [1, 1, 2, 3, 4],
-            [2, 3, 4, 5, 6],
-            [3, 5, 6, 7, 8],
-            [4, 7, 9, 10, 11],
-            [5, 10, 11, 12, 13],
-            [6, 12, 13, 14, 15],
+            [1, 2, 3, 4, 5, 6],
+            [4, 5, 6, 7, 8, 9],
+            [7, 8, 9, 10, 11, 12],
+            [10, 11, 22, 13, 14, 15],
+            [13, 14, 15, 16, 17, 18],
+            [16, 17, 18, 19, 20, 21],
         ]
         self.assertEqual(geometry['edof'].tolist(), expected_edof)
 
@@ -90,8 +76,8 @@ class TestGenerator(unittest.TestCase):
     def test_generate_loads(self, mocked_choice):
         mocked_choice.side_effect = lambda x: x[0]
         geometry = {
-            'dof': np.array([[1, 2], [3, 4]]),
-            'bc': np.array([[1, 0], [2, 0]]),
+            'dof': np.array([[1, 2, 3], [4, 5, 6]]),
+            'bc': np.array([2, 5]),
             'nels': 2
         }
         loads = generate_loads(geometry, self.properties)

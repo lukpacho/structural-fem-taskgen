@@ -3,7 +3,7 @@ import json
 import os
 import numpy as np
 from unittest.mock import patch
-from src.solver.beam_solver import solve_beam
+from src.solver.beam_solver import solve_beam, plot_beam_results, plot_beam_displacements
 
 
 class TestSolver(unittest.TestCase):
@@ -15,18 +15,18 @@ class TestSolver(unittest.TestCase):
                                [6., 0.],
                                [9., 0.],
                                [12., 0.]]),
-            'dof': np.array([[1, 2],
-                             [3, 4],
-                             [3, 5],
-                             [6, 7],
-                             [8, 9],
-                             [10, 11]]),
-            'edof': np.array([[1, 2, 3, 4],
-                              [3, 5, 6, 7],
-                              [6, 7, 8, 9],
-                              [8, 9, 10, 11]]),
-            'bc': np.array([1, 2, 6, 10]),
-            'ndofs': 11,
+            'dof': np.array([[1, 2, 3],
+                             [4, 5, 6],
+                             [4, 5, 16],
+                             [7, 8, 9],
+                             [10, 11, 12],
+                             [13, 14, 15]]),
+            'edof': np.array([[1, 2, 3, 4, 5, 6],
+                              [4, 5, 16, 7, 8, 9],
+                              [7, 8, 9, 10, 11, 12],
+                              [10, 11, 12, 13, 14, 15]]),
+            'bc': np.array([1, 2, 3, 8, 14]),
+            'ndofs': 16,
             'nels': 4
         }
         self.element_properties = [
@@ -40,18 +40,21 @@ class TestSolver(unittest.TestCase):
              'section': {'type': 'square20', 'A': 400, 'I': 13333.3}}
         ]
         self.loads = {
-            'P_loc': 2,
+            'P_loc': 4,  # (DOF number - 1) for concentrated force
             'P': 5,
-            'q_loc': [2, 3],  # Element number for distributed load
-            'q': -2  # Magnitude of distributed load per unit length
+            'q_loc': [2, 3],  # (Element number -1) for distributed load
+            'q': [-2, -2]  # Magnitude of distributed load per unit length
         }
 
     def test_solve_beam(self):
-        a, ex, ey, ed, element_results = solve_beam(self.geometry, self.element_properties, self.loads)
+        a, ex, ey, element_results, max_results = solve_beam(self.geometry, self.element_properties, self.loads)
 
-        expected_displacements = np.array([0.0000e+00, 0.0000e+00, 1.1813e-02, 5.9063e-03,
-                                           -3.8438e-03, 0.0000e+00, -4.1250e-03, -8.0156e-03,
-                                           -4.6875e-05, 0.0000e+00, 4.3125e-03])
+        expected_displacements = np.array([0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
+                                           0.00000000e+00, 1.18125295e-02, 5.90626477e-03,
+                                           0.00000000e+00, 0.00000000e+00, -4.12501031e-03,
+                                           0.00000000e+00, -8.01564504e-03, -4.68751172e-05,
+                                           0.00000000e+00, 0.00000000e+00, 4.31251078e-03,
+                                           -3.84375961e-03])
         computed_displacements = np.array(a).flatten()
 
         np.testing.assert_allclose(
