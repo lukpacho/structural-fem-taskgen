@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="Working generator and solver for beams. Not working plotting. Switching to frames.">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="Switched to frames, working random generated and predefined solver. Working displacements plot. Currently working on adding displacement annotations of the plot.">
+      <change afterPath="$PROJECT_DIR$/src/solver/beam_plotter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/properties.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/solver/beam_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solver/beam_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_solver.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,26 +35,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.Python tests in test_generator.py.executor": "Run",
-    "Python tests.Python tests in test_solver.py.executor": "Run",
-    "Python.generator.executor": "Run",
-    "Python.main --mode predefined.executor": "Run",
-    "Python.main --mode random.executor": "Run",
-    "Python.main.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "/media/lukpacho/Disk-1/OneDrivePG/PycharmProjects/spineAramisVis",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests in test_generator.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_solver.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.generator.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main --mode predefined.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main --mode random.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/media/lukpacho/Disk-1/OneDrivePG/PycharmProjects/spineAramisVis&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.main --mode predefined">
     <configuration name="generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="problemGeneratorMO_v2" />
@@ -206,8 +202,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.17890.14" />
-        <option value="bundled-python-sdk-5b207ade9991-7e9c3bbb6e34-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.17890.14" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18034.82" />
+        <option value="bundled-python-sdk-975db3bf15a3-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18034.82" />
       </set>
     </attachedChunks>
   </component>
@@ -225,7 +221,10 @@
       <workItem from="1718010785697" duration="11000000" />
       <workItem from="1718091164144" duration="21957000" />
       <workItem from="1718176415475" duration="949000" />
-      <workItem from="1718177589779" duration="15973000" />
+      <workItem from="1718177589779" duration="16167000" />
+      <workItem from="1718874798020" duration="2063000" />
+      <workItem from="1719400733833" duration="7990000" />
+      <workItem from="1719416480468" duration="1022000" />
     </task>
     <task id="LOCAL-00001" summary="Working generator and solver for beams. Not working plotting. Switching to frames.">
       <option name="closed" value="true" />
@@ -243,7 +242,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718111149771</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Switched to frames, working random generated and predefined solver. Working displacements plot. Currently working on adding displacement annotations of the plot.">
+      <option name="closed" value="true" />
+      <created>1718197160071</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1718197160076</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -251,12 +258,13 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Working generator and solver for beams. Not working plotting. Switching to frames." />
-    <option name="LAST_COMMIT_MESSAGE" value="Working generator and solver for beams. Not working plotting. Switching to frames." />
+    <MESSAGE value="Switched to frames, working random generated and predefined solver. Working displacements plot. Currently working on adding displacement annotations of the plot." />
+    <option name="LAST_COMMIT_MESSAGE" value="Switched to frames, working random generated and predefined solver. Working displacements plot. Currently working on adding displacement annotations of the plot." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$.coverage" NAME=" Coverage Results" MODIFIED="1718193392817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main.coverage" NAME="main Coverage Results" MODIFIED="1718182968706" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1718196896009" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1719416759503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$generator.coverage" NAME="generator Coverage Results" MODIFIED="1717762861756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1718193184134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

@@ -2,7 +2,8 @@
 import argparse
 import os
 from src.generator import load_properties, save_beam_input, generate_geometry, generate_element_properties, generate_loads
-from src.solver.beam_solver import solve_beam, plot_beam_results
+from src.solver.beam_solver import solve_beam
+from src.solver.beam_plotter import plot_beam_results
 from src.pdf_generator.pdf_generator import generate_beam_pdf
 
 
