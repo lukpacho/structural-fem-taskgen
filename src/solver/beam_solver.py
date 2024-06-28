@@ -63,13 +63,17 @@ def solve_beam(geometry, element_properties, loads):
     # Post-processing to get element displacements and forces
     ed = extract_ed(edof, a)
     element_results = {}
-    max_results = {'ed': 0}
+    max_results = {'displacement': 0, 'shear_force': 0, 'moment': 0}
 
     for i in range(nels):
         es, edi, eci = beam2s(ex[i], ey[i], ep[i], ed[i], eq[i], 11)
         element_results[i] = {'es': es, 'edi': edi, 'eci': eci}
         current_max_displacement = np.max(np.abs(edi))
-        max_results['ed'] = max(max_results['ed'], current_max_displacement)
+        current_max_shear = np.max(np.abs(es[1]))
+        current_max_moment = np.max(np.abs(es[2]))
+        max_results['displacement'] = max(max_results['displacement'], current_max_displacement)
+        max_results['shear_force'] = max(max_results['shear_force'], current_max_shear)
+        max_results['moment'] = max(max_results['moment'], current_max_moment)
 
     return a, ex, ey, element_results, max_results
 
