@@ -36,7 +36,7 @@ def run_simulation(beam_version, num_simulations, mode, properties):
             plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, simulation_index)
 
             # Generate PDF report for the simulation
-            generate_beam_pdf()
+            generate_beam_pdf(geometry, element_properties, loads, max_results, mode, beam_version, simulation_index)
 
     elif mode == 'predefined':
         geometry = properties[beam_version]['geometry']
@@ -48,7 +48,7 @@ def run_simulation(beam_version, num_simulations, mode, properties):
         plot_beam_results(ex, ey, element_results, max_results, mode, beam_version)
 
         # Generate PDF report for the simulation
-        generate_beam_pdf()
+        generate_beam_pdf(geometry, element_properties, loads, max_results, mode, beam_version)
 
 
 def main():
@@ -59,7 +59,6 @@ def main():
     parser.add_argument('--num_simulations', type=int, default=1, help='Number of simulations to perform')
 
     args = parser.parse_args()
-
     if args.mode == 'predefined' and args.num_simulations != 1:
         raise ValueError("Multiple simulations are not allowed in predefined mode.")
 

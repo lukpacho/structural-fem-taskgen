@@ -106,8 +106,9 @@ def is_near_other_annotations(pos_x, pos_y, positions, threshold=ANNOTATION_THRE
 
 def adjust_annotation_position(ax, pos_x, pos_y, text, annotation_positions):
     """Adjust the annotation position if it overlaps with the plot edge or other annotations"""
-    predefined_offsets = [(0, 10), (10, 10), (-10, 10), (0, -10), (10, -10), (-10, -10),
-                          (0, 20), (20, 20), (-20, 20), (0, -20), (20, -20), (-20, -20)]
+    offset = 20
+    predefined_offsets = [(0, offset), (offset, offset), (-offset, offset),
+                          (0, -offset), (offset, -offset), (-offset, -offset)]
     for offset in predefined_offsets:
         annotation = ax.annotate(text, xy=(pos_x, pos_y), textcoords="offset points", xytext=offset,
                                  ha='center', va='bottom', arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color='blue'),
@@ -130,6 +131,33 @@ def adjust_annotation_position(ax, pos_x, pos_y, text, annotation_positions):
                        bbox=dict(boxstyle="round,pad=0.5", facecolor='yellow', edgecolor='black', alpha=0.5))
 
 
+def adjust_title_position(ax, title):
+    """Adjust the vertical position of the title to avoid overlapping with annotations."""
+    renderer = ax.figure.canvas.get_renderer()
+    vertical_offset = 1.02  # Start with some basic offset above the top of the axis
+
+    # Create a temporary text object for checking
+    temp_title = ax.text(0.5, vertical_offset, title, transform=ax.transAxes, ha='center', va='top')
+
+    # Incrementally test for overlaps, increasing the offset until there are no overlaps
+    while vertical_offset < 1.2:  # Limit to reasonable height above the plot
+        temp_title.set_position((0.5, vertical_offset))  # Update y position of temporary title
+        title_bbox = temp_title.get_window_extent(renderer=renderer)
+        annotations = [child for child in ax.get_children() if isinstance(child, matplotlib.text.Annotation)]
+        overlaps = any(
+            title_bbox.overlaps(annotation.get_window_extent(renderer=renderer)) for annotation in annotations)
+
+        if not overlaps:
+            break  # If no overlaps, we've found a good vertical position
+        vertical_offset += 0.02  # Increase offset to try higher position
+
+    # Remove the temporary text object after position determination
+    temp_title.remove()
+
+    # Set the actual title at the final determined vertical position
+    ax.set_title(title, loc='center', y=vertical_offset)
+
+
 def manage_plot(simulation_data, fig, ax, title, axis=False, save_format='png', show=True, tight_layout=True):
     """
     Manage the plotting operations like setting titles, saving, and displaying.
@@ -148,7 +176,7 @@ def manage_plot(simulation_data, fig, ax, title, axis=False, save_format='png', 
         ax.axis('off')
 
     if title:
-        ax.set_title(title)
+        adjust_title_position(ax, title)
 
     if tight_layout:
         plt.tight_layout()
