@@ -15,91 +15,109 @@
 
 \begin{document}
 
-\begin{center}
+    \begin{center}
     {\Large \textbf{Metody Obliczeniowe - Projekt}}
-\end{center}
+    \end{center}
 
-\begin{table}[ht]
-    \centering
-    \begin{tabular}{
-        m{.175\textwidth}m{.215\textwidth}m{.175\textwidth}m{.175\textwidth}m{.1\textwidth}}
-    \toprule
-    Imię & Nazwisko & Numer albumu & Numer grupy  & Ocena \\ \midrule
-         &          &              &              &       \\ \bottomrule
-    \end{tabular}
-    \label{tab:dane_studenta}
-\end{table}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{
+            m{.175\textwidth}m{.215\textwidth}m{.175\textwidth}m{.175\textwidth}m{.1\textwidth}}
+        \toprule
+        Imię & Nazwisko & Numer albumu & Numer grupy  & Ocena \\ \midrule
+             &          &              &              &       \\ \bottomrule
+        \end{tabular}
+        \label{tab:dane_studenta}
+    \end{table}
 
-Dla danego układu prętowego należy wyznaczyć wykresy sił wewnętrznych (siły tnące \(T\) i momenty zginające \(M\))
-oraz przedstawić szkic deformacji układu. Zadanie należy rozwiązać, stosując Macierzową Metodę Przemieszczeń
-dla elementów belkowych. W analizie numerycznej proszę wykorzystać bibliotekę CalFEM w środowisku MATLAB.
-Poniższa tabela zawiera dane wymagane do realizacji zadania, przedstawione w jednostkach:
-\(L \rightarrow \si{m}\), \(E \rightarrow \si{GPa}\), \(I \rightarrow \si{\centi\meter^4}\).
+    Dla danego układu prętowego należy wyznaczyć wykresy sił wewnętrznych (siły tnące \(T\) i momenty zginające \(M\))
+    oraz przedstawić szkic deformacji układu. Zadanie należy rozwiązać, stosując Macierzową Metodę Przemieszczeń
+    dla elementów belkowych. W analizie numerycznej proszę wykorzystać bibliotekę CalFEM w środowisku MATLAB.
+    Poniższa tabela zawiera dane wymagane do realizacji zadania, przedstawione w jednostkach:
+    \(L \rightarrow \si{m}\), \(E \rightarrow \si{GPa}\), \(I \rightarrow \si{\centi\meter^4}\).
 
-%\begin{minipage}[s]{\textwidth}
-%    \vspace{3mm}
-%    \renewcommand{\arraystretch}{1.25}
-%    \centering
-%    \begin{tabular}{llllll}
-%        \multicolumn{6}{l}{Zestaw danych nr \VAR{beam_version}\VAR{simulation_index}} \\
-%        $L_1$ = \VAR{lengths[0]} & $L_1$ = \VAR{lengths[1]} & $L_1$ = \VAR{lengths[2]} & $L_1$ = \VAR{lengths[3]} & $L_1$ = \VAR{lengths[4]} & $L_1$ = \VAR{lengths[5]} \\
-%        E1 = \VAR{materials[0]} & E2 = \VAR{materials[1]} & E3 = \VAR{materials[2]} & E4 = \VAR{materials[3]} & E5 = \VAR{materials[4]} & E6 = \VAR{materials[5]} \\
-%        I1 = \VAR{inertia[0]} & I2 = \VAR{inertia[1]} & I3 = \VAR{inertia[2]} & I4 = \VAR{inertia[3]} & I5 = \VAR{inertia[4]} & I6 = \VAR{inertia[5]}
-%    \end{tabular}
-%    \label{tab:dane_zadania}
-%    \vspace{3mm}
-%\end{minipage}
+    \noindent
+    \begin{minipage}[s]{\textwidth}
+        \vspace{3mm}
+        \renewcommand{\arraystretch}{1.25}
+        \centering
+        \begin{tabular}{\VAR{"l" * (nels)}}
+            \multicolumn{\VAR{nels}}{l}{Zestaw danych nr \VAR{beam_version}\VAR{simulation_index}} \\
+            \BLOCK{ for i in range(nels) }
+                $L_{\VAR{i+1}} = \VAR{lengths[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+            \BLOCK{ endfor }
+            \\
+            \BLOCK{ for i in range(nels) }
+                $E_\VAR{i+1} = \VAR{materials[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+            \BLOCK{ endfor }
+            \\
+            \BLOCK{ for i in range(nels) }
+                $I_\VAR{i+1} = \VAR{inertias[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+            \BLOCK{ endfor }
+        \end{tabular}
+        \label{tab:dane_zadania2}
+        \vspace{3mm}
+    \end{minipage}
 
-\noindent
-\begin{minipage}[s]{\textwidth}
-    \vspace{3mm}
-    \renewcommand{\arraystretch}{1.25}
-    \centering
-    \begin{tabular}{\VAR{"l" * (nels)}}
-        \multicolumn{\VAR{nels}}{l}{Zestaw danych nr \VAR{beam_version}\VAR{simulation_index}} \\
-        \BLOCK{ for i in range(nels) }
-            $L_{\VAR{i+1}} = \VAR{lengths[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+
+%    Na układ działają następujące obciążenia:
+%    $P = \VAR{forces.P} \si{kN}$, $M  = \VAR{moments.M} \si{kNm}$, $q = \VAR{lineloads.q} \si{kN/m}$.
+%    \vspace{10mm}
+
+
+    \noindent\begin{minipage}[s]{\textwidth}
+        \centering\begin{tikzpicture}
+        % nodes definition
+        \BLOCK{ for node in nodes }
+            \point{\VAR{node.name}}{\VAR{node.x}}{\VAR{node.y}}
         \BLOCK{ endfor }
-        \\
-        \BLOCK{ for i in range(nels) }
-            $E_\VAR{i+1} = \VAR{materials[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+        % elements definition
+        \BLOCK{ for element in elements }
+            \beam{2}{\VAR{element.start}}{\VAR{element.end}}
+            \notation{4}{\VAR{element.start}}{\VAR{element.end}}[$E_\VAR{loop.index}$, $I_\VAR{loop.index}$][0.5][below];
+            \dimensioning{1}{\VAR{element.start}}{\VAR{element.end}}{-1.5}[$L_\VAR{loop.index}$]
         \BLOCK{ endfor }
-        \\
-        \BLOCK{ for i in range(nels) }
-            $I_\VAR{i+1} = \VAR{inertia[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
+        % hinges definition
+        \BLOCK{ for hinge in hinges }
+            \hinge{1}{\VAR{hinge}}
         \BLOCK{ endfor }
-    \end{tabular}
-    \label{tab:dane_zadania2}
-    \vspace{3mm}
-\end{minipage}
+        % supports definition
+        \BLOCK{ for support in supports }
+            \support{\VAR{support.type_number}}{\VAR{support.node}}[\VAR{support.rotation}]
+        \BLOCK{ endfor }
+        % loads definition
+        \BLOCK{ for force in forces}
+            \load{1}{\VAR{force.node}}[\VAR{force.rotation}][\VAR{force.length}][\VAR{force.distance}]
+        \BLOCK{ endfor }
+        \BLOCK{ for moment in moments}
+            \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
+        \BLOCK{ endfor }
+        \BLOCK{ for lineload in lineloads}
+            \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}]
+        \BLOCK{ endfor }
+        \end{tikzpicture}
+    \end{minipage}
 
+    \vspace{10mm}
+    Wykonane opracowanie powinno zawierać:
 
-Na układ działają następujące obciążenia:
-$P = \VAR{load.P} \si{kN}$, $M  = \VAR{load.M} \si{kNm}$, $q = \VAR{load.q} \si{kN/m}$.
-
-
-\vspace{10mm}
-Wykonane opracowanie powinno zawierać:
-
-\begin{table}[ht]
+    \begin{table}[ht]
     \centering
     \begin{tabular}{m{.01\textwidth}m{.7\textwidth}m{.15\textwidth}}
     \toprule
-    1 & Rysunek dyskretyzacji układu & 5 pkt \\ \midrule
-    2 & Skrypt rozwiązujący dane zadanie w formacie *.m & 5 pkt \\ \midrule
-    3 & Wykresy sił wewnętrznych (T, M) & 5 pkt \\ \midrule
-    4 & Szkic deformacji & 5 pkt \\ \bottomrule
+    1 & Rysunek układu po dyskretyzacji & 5 pkt \\ \midrule
+    2 & Skrypt w MATLAB-ie rozwiązujący zadanie (*.m) & 5 pkt \\ \midrule
+    3 & Wykresy sił wewnętrznych: siły tnące \(T\) i momenty zginające \(M\) & 5 pkt \\ \midrule
+    4 & Szkic deformacji układu & 5 pkt \\ \bottomrule
     \end{tabular}
     \label{tab:punktacja}
-\end{table}
+    \end{table}
 
-\vspace{5mm}
-UWAGI:
-\begin{itemize}
-    \item Rysunek dyskretyzacji oraz wykresy sił tnących, momentów i deformacji powinny
-    zostać wykonane na odwrocie karty projektu.
-    \item Skrypt rozwiązujący daną belkę powinen zostać wgrany do modułu projektu
-    w kursie Metody Obliczenione na eNauczaniu.
-\end{itemize}
+    \vspace{5mm}
+    UWAGI:
+    \begin{itemize}
+        \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz szkic deformacji należy umieścić na odwrocie karty projektowej.
+        \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu Metody Obliczeniowe.
+    \end{itemize}
 
 \end{document}
