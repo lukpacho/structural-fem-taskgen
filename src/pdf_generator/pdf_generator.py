@@ -75,21 +75,30 @@ def generate_beam_pdf(template_file, output_name, data):
     compile_latex_to_pdf(output_name)
 
 
-def prepare_nodes_and_hinges(geometry):
+def prepare_nodes_hinges_and_dof_mapping(geometry):
     coord_to_node = {}
     nodes = []
     hinges = []
+    dof_to_node = {}
+    dof_types = ['x', 'y', 'rotation']
+
     for idx, coord in enumerate(geometry['coord']):
         coord_tuple = tuple(coord)
         if coord_tuple in coord_to_node:
-            if coord_tuple not in hinges:
-                hinges.append(coord_to_node[coord_tuple])
+            node_name = coord_to_node[coord_tuple]
+            if node_name not in hinges:
+                hinges.append(node_name)
         else:
             node_name = f'n{len(nodes) + 1}'
             nodes.append({'name': node_name, 'x': coord[0], 'y': coord[1]})
             coord_to_node[coord_tuple] = node_name
 
-    return nodes, hinges
+        dofs = geometry['dof'][idx]
+        for i, dof in enumerate(dofs):
+            dof_type = dof_types[i % 3]
+            dof_to_node[dof] = {'node': node_name, 'type': dof_type}
+
+    return nodes, hinges, dof_to_node
 
 
 def prepare_elements(nodes):
@@ -141,31 +150,50 @@ def prepare_forces(loads, nodes):
         node_idx = (loads['P_loc'] - 1) // 3  # Assuming each node has 3 dofs
         node_name = nodes[node_idx]['name']
         rotation = -90 if loads['P'] > 0 else 90
+        distance = -1.6 if loads['P'] > 0 else 0.1
         forces.append({
             'node': node_name,
             'type': 'point',
             'magnitude': abs(loads['P']),
             'rotation': rotation,
             'length': 1.5,
-            'distance': 0.05
+            'distance': distance
         })
     return forces
 
 
-def prepare_moments(loads, nodes):
+def prepare_moments(loads, nodes, hinges, dof_to_node):
     moments = []
     if 'M' in loads:
-        node_idx = (loads['M_loc'] - 1) // 3
-        node_name = nodes[node_idx]['name']
-        orientation = 3 if loads['M'] > 0 else 2  # 2 for clockwise, 3 for counterclockwise
-        moments.append({
-            'node': node_name,
-            'orientation': orientation,
-            'magnitude': abs(loads['M']),
-            'rotation': 10,
-            'angle': 200,
-            'distance': 0.5
-        })
+        dof_number = loads['M_loc']
+        if dof_number in dof_to_node:
+            node_info = dof_to_node[dof_number]
+            node_name = node_info['node']
+            dof_type = node_info['type']
+            orientation = 3 if loads['M'] > 0 else 2  # 2 for CW and 3 for CCW rotation
+
+            if node_name in hinges:
+                side = 'left' if (dof_number - 1) % 3 < 1 else 'right'
+                rotation = -90 if side == 'left' else 90
+                moments.append({
+                    'node': node_name,
+                    'orientation': orientation,
+                    'magnitude': abs(loads['M']),
+                    'rotation': rotation,
+                    'angle': 200,
+                    'distance': 0.5
+                })
+            else:
+                moments.append({
+                    'node': node_name,
+                    'orientation': orientation,
+                    'magnitude': abs(loads['M']),
+                    'rotation': 10,
+                    'angle': 200,
+                    'distance': 0.5
+                })
+        else:
+            print(f"Ostrzeżenie: Stopień swobody {dof_number} nie znaleziony w mapowaniu dof_to_node.")
     return moments
 
 
@@ -174,29 +202,31 @@ def prepare_lineloads(loads, elements):
     for q_val, q_range in zip(loads['q'], loads['q_loc']):
         start_node = elements[q_range]['start']
         end_node = elements[q_range]['end']
-        value = -0.35 if q_val > 0 else 0.35
+        value = -0.5 if q_val > 0 else 0.5
+        distance = 0.4 if q_val > 0 else -0.1
         lineloads.append({
             'node1': start_node,
             'node2': end_node,
             'type': 'distributed',
             'value': value,
-            'magnitude': q_val
+            'distance': distance,
+            'magnitude': abs(q_val)
         })
     return lineloads
 
 
-def prepare_loads(loads, nodes, elements):
+def prepare_loads(loads, nodes, hinges, elements, dof_to_node):
     forces = prepare_forces(loads, nodes)
-    moments = prepare_moments(loads, nodes)
+    moments = prepare_moments(loads, nodes, hinges, dof_to_node)
     lineloads = prepare_lineloads(loads, elements)
     return forces, moments, lineloads
 
 
 def prepare_data_for_latex(beam_version: str, simulation_index, geometry, element_properties, loads):
-    nodes, hinges = prepare_nodes_and_hinges(geometry)
+    nodes, hinges, dof_to_node = prepare_nodes_hinges_and_dof_mapping(geometry)
     elements = prepare_elements(nodes)
     supports = determine_supports(geometry, nodes)
-    forces, moments, lineloads = prepare_loads(loads, nodes, elements)
+    forces, moments, lineloads = prepare_loads(loads, nodes, hinges, elements, dof_to_node)
 
     materials = [f"{ep['material']['E']/1_000_000:.0f}" for ep in element_properties]
     inertias = [f"{ep['section']['I']:.0f}" for ep in element_properties]
@@ -217,7 +247,7 @@ if __name__ == '__main__':
     geometry = {'coord': [[0, 0], [3, 0], [3, 0], [6, 0], [9, 0], [12, 0]],
      'dof': [[1, 2, 3], [4, 5, 6], [4, 5, 16], [7, 8, 9], [10, 11, 12], [13, 14, 15]],
      'edof': [[1, 2, 3, 4, 5, 6], [4, 5, 16, 7, 8, 9], [7, 8, 9, 10, 11, 12], [10, 11, 12, 13, 14, 15]],
-     'bc': [1, 2, 3, 8, 14], 'ndofs': 16, 'nels': 4}
+     'bc': [1, 8, 13, 14, 15], 'ndofs': 16, 'nels': 4}
 
     element_properties = [
         {'material': {'type': 'concrete', 'E': 30000000.0}, 'section': {'type': 'square20', 'A': 400, 'I': 13333.3}},
@@ -226,7 +256,7 @@ if __name__ == '__main__':
         {'material': {'type': 'concrete', 'E': 30000000.0}, 'section': {'type': 'square20', 'A': 400, 'I': 13333.3}}
     ]
 
-    loads = {'P': 5, 'P_loc': 4, 'q': [-2, -2], 'q_loc': [2, 3]}
+    loads = {'P': 5, 'P_loc': 4, 'M': 1, 'M_loc': 6, 'q': [-2], 'q_loc': [3]}
 
     # data = {
     #     'nels': 6,

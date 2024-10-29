@@ -7,16 +7,20 @@
 \usepackage{stanli}
 \usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{calc}
+\usepackage{xcolor}
 
 \pagestyle{fancy}
 \fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
 \fancyhead[R]{\small rok. akad. \VAR{academic_year}}
-\fancyfoot{}
+\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{beam_version}\VAR{simulation_index}}}}
+\fancyfoot[C]{}
 
 \begin{document}
 
     \begin{center}
-    {\Large \textbf{Metody Obliczeniowe - Projekt}}
+    {\Large \textbf{Podstawy Mechaniki Komputerowej - Projekt}}
     \end{center}
 
     \begin{table}[ht]
@@ -30,43 +34,80 @@
         \label{tab:dane_studenta}
     \end{table}
 
-    Dla danego układu prętowego należy wyznaczyć wykresy sił wewnętrznych (siły tnące \(T\) i momenty zginające \(M\))
-    oraz przedstawić szkic deformacji układu. Zadanie należy rozwiązać, stosując Macierzową Metodę Przemieszczeń
-    dla elementów belkowych. W analizie numerycznej proszę wykorzystać bibliotekę CalFEM w środowisku MATLAB.
-    Poniższa tabela zawiera dane wymagane do realizacji zadania, przedstawione w jednostkach:
-    \(L \rightarrow \si{m}\), \(E \rightarrow \si{GPa}\), \(I \rightarrow \si{\centi\meter^4}\).
+    \noindent\textbf{Treść zadania:} \vspace{1mm}
 
-    \noindent
-    \begin{minipage}[s]{\textwidth}
-        \vspace{3mm}
-        \renewcommand{\arraystretch}{1.25}
-        \centering
-        \begin{tabular}{\VAR{"l" * (nels)}}
-            \multicolumn{\VAR{nels}}{l}{Zestaw danych nr \VAR{beam_version}\VAR{simulation_index}} \\
+    Dla przedstawionego układu prętowego należy:
+
+    \begin{itemize}
+        \item Wyznaczyć wykresy sił wewnętrznych: sił tnących \(T\) oraz momentów zginających \(M\), \textbf{przedstawione w odpowiednich jednostkach}.
+        \item Sporządzić \textbf{rysunek} deformacji układu, oznaczając \textbf{wartości charakterystyczne ugięć} oraz uwzględniając \textbf{obliczone kąty obrotu}.
+    \end{itemize}
+
+    Zadanie należy rozwiązać, stosując \textbf{Macierzową Metodę Przemieszczeń} dla elementów belkowych. W analizie numerycznej proszę wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}. Poniższa tabela zawiera dane niezbędne do realizacji zadania:
+
+    \begin{table}[ht]
+    \centering
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{\VAR{"l" * (nels) + "l"}}
+    \toprule
+    Długość [\si{m}] &
             \BLOCK{ for i in range(nels) }
                 $L_{\VAR{i+1}} = \VAR{lengths[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
             \BLOCK{ endfor }
             \\
+    Moduł Younga [\si{GPa}] &
             \BLOCK{ for i in range(nels) }
                 $E_\VAR{i+1} = \VAR{materials[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
             \BLOCK{ endfor }
             \\
+    Moment bezwładności [\si{\centi\meter^4}] &
             \BLOCK{ for i in range(nels) }
                 $I_\VAR{i+1} = \VAR{inertias[i]}$ \BLOCK{ if not loop.last }&\BLOCK{ endif }
             \BLOCK{ endfor }
-        \end{tabular}
-        \label{tab:dane_zadania2}
-        \vspace{3mm}
-    \end{minipage}
+            \\
+    \bottomrule
+    \end{tabular}
+    \label{tab:dane_zadania2}
+    \end{table}
 
+    Na zadany układ działają następujące obciążenia w postaci
+    \BLOCK{ for force in forces}
+        \BLOCK{if loop.first}
+            \BLOCK{ if loop.last > 1} sił skupionych
+            \BLOCK{ else } siły skupionej
+            \BLOCK{ endif }
+        \BLOCK{ endif }
+        $P_\VAR{loop.index} = \VAR{force.magnitude} \si{\kilo\newton}$%
+        \BLOCK{ if not loop.last }, \BLOCK{ endif }
+    \BLOCK{ endfor }
+    ,
+    \BLOCK{ for moment in moments}
+        \BLOCK{if loop.first}
+            \BLOCK{ if loop.last > 1} momentów zginających
+            \BLOCK{ else } momentu zginającego
+            \BLOCK{ endif }
+        \BLOCK{ endif }
+        $M_\VAR{loop.index} = \VAR{moment.magnitude} \si{\kilo\newton m}$
+        \BLOCK{ if not loop.last }, \BLOCK{ endif }
+    \BLOCK{ endfor }
+    oraz
+    \BLOCK{ for lineload in lineloads}
+        \BLOCK{if loop.first}
+            \BLOCK{ if loop.last > 1} obciążeń liniowych
+            \BLOCK{ else } obciążenia liniowego
+            \BLOCK{ endif }
+        \BLOCK{ endif }
+        $q_\VAR{loop.index} = \VAR{lineload.magnitude} \si{\kilo\newton/\meter}$%
+        \BLOCK{ if not loop.last }, \BLOCK{ endif }
+    \BLOCK{ endfor }
+    .
 
-%    Na układ działają następujące obciążenia:
-%    $P = \VAR{forces.P} \si{kN}$, $M  = \VAR{moments.M} \si{kNm}$, $q = \VAR{lineloads.q} \si{kN/m}$.
-%    \vspace{10mm}
+    \vspace{5mm}
 
+    \noindent\textbf{Schemat układu:}
 
-    \noindent\begin{minipage}[s]{\textwidth}
-        \centering\begin{tikzpicture}
+    \begin{center}
+    \begin{tikzpicture}
         % nodes definition
         \BLOCK{ for node in nodes }
             \point{\VAR{node.name}}{\VAR{node.x}}{\VAR{node.y}}
@@ -74,7 +115,7 @@
         % elements definition
         \BLOCK{ for element in elements }
             \beam{2}{\VAR{element.start}}{\VAR{element.end}}
-            \notation{4}{\VAR{element.start}}{\VAR{element.end}}[$E_\VAR{loop.index}$, $I_\VAR{loop.index}$][0.5][below];
+            \notation{4}{\VAR{element.start}}{\VAR{element.end}}[$E_\VAR{loop.index}$, $I_\VAR{loop.index}$][0.5][below=.2mm];
             \dimensioning{1}{\VAR{element.start}}{\VAR{element.end}}{-1.5}[$L_\VAR{loop.index}$]
         \BLOCK{ endfor }
         % hinges definition
@@ -93,31 +134,29 @@
             \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
         \BLOCK{ endfor }
         \BLOCK{ for lineload in lineloads}
-            \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}]
+            \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}][\VAR{lineload.distance}]
         \BLOCK{ endfor }
-        \end{tikzpicture}
-    \end{minipage}
-
-    \vspace{10mm}
-    Wykonane opracowanie powinno zawierać:
-
-    \begin{table}[ht]
-    \centering
-    \begin{tabular}{m{.01\textwidth}m{.7\textwidth}m{.15\textwidth}}
-    \toprule
-    1 & Rysunek układu po dyskretyzacji & 5 pkt \\ \midrule
-    2 & Skrypt w MATLAB-ie rozwiązujący zadanie (*.m) & 5 pkt \\ \midrule
-    3 & Wykresy sił wewnętrznych: siły tnące \(T\) i momenty zginające \(M\) & 5 pkt \\ \midrule
-    4 & Szkic deformacji układu & 5 pkt \\ \bottomrule
-    \end{tabular}
-    \label{tab:punktacja}
-    \end{table}
+    \end{tikzpicture}
+    \end{center}
 
     \vspace{5mm}
-    UWAGI:
+
+    \noindent\textbf{Wymagane elementy opracowania:}
+
+    \begin{enumerate}
+    \item Rysunek układu po dyskretyzacji \dotfill 5 pkt
+    \item Skrypt w MATLAB-ie rozwiązujący zadanie (*.m) \dotfill 5 pkt
+    \item Wykresy sił wewnętrznych: siły tnące \(T\) [\si{\kilo\newton}] i momenty zginające \(M\) [\si{\kilo\newton m}] \dotfill 10 pkt
+    \item Rysunek deformacji układu [\si{\centi\meter}] \dotfill 5 pkt
+    \end{enumerate}
+
+    \vspace{5mm}
+
+    \noindent\textbf{Uwagi:}
     \begin{itemize}
-        \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz szkic deformacji należy umieścić na odwrocie karty projektowej.
-        \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu Metody Obliczeniowe.
+    \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz rysunek deformacji należy umieścić na odwrocie karty projektowej.
+    \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
+    \item Nieprzesłanie skryptu skutkuje przyznaniem 0 punktów za punkty 3. i 4.
     \end{itemize}
 
 \end{document}
