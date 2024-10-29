@@ -101,14 +101,23 @@ def prepare_nodes_hinges_and_dof_mapping(geometry):
     return nodes, hinges, dof_to_node
 
 
-def prepare_elements(nodes):
+def prepare_elements(geometry, dof_to_node):
     elements = []
-    for i in range(len(nodes) - 1):
-        elements.append({'start': nodes[i]['name'], 'end': nodes[i + 1]['name']})
+    for idx, edof in enumerate(geometry['edof']):
+        start_dof = edof[:3]
+        end_dof = edof[3:6]
+
+        start_node = dof_to_node[start_dof[0]]['node']
+        end_node = dof_to_node[end_dof[0]]['node']
+
+        if start_node != end_node:
+            elements.append({'start': start_node, 'end': end_node})
+        else:
+            print(f"Warning: Element {idx} has the same start node and end node {start_node}.")
     return elements
 
 
-def determine_supports(geometry, nodes):
+def determine_supports(geometry, nodes, dof_to_node):
     support_types = {
         1: ('floating bearing', 2),
         2: ('fixed bearing', 1),
@@ -118,70 +127,81 @@ def determine_supports(geometry, nodes):
 
     # Initialize support records for each boundary condition
     for bc in geometry['bc']:
-        node_idx = (bc - 1) // 3
-        node_name = nodes[node_idx]['name']
-        if node_name not in node_supports:
-            node_supports[node_name] = set()
-        node_supports[node_name].add((bc - 1) % 3)
+        if bc in dof_to_node:
+            node_name = dof_to_node[bc]['node']
+            dof_type = dof_to_node[bc]['type']
+            if node_name not in node_supports:
+                node_supports[node_name] = set()
+            node_supports[node_name].add(dof_type)
+        else:
+            print(f"Warning: Degree of freedom {bc} was not found in dof_to_node mapping.")
 
     # Determine the type of support based on the number of dofs constrained
     supports = []
     last_node_name = nodes[-1]['name']
-    for node, dofs in node_supports.items():
-        if len(dofs) in support_types:
-            support_type, type_number = support_types[len(dofs)]
+    for node, dof_types in node_supports.items():
+        num_constraints = len(dof_types)
+        if num_constraints in support_types:
+            support_type, type_number = support_types[num_constraints]
             if support_type == 'fixed support':
-                if node == 'n1':
-                    rotation = -90
-                elif node == last_node_name:
-                    rotation = 90
+                rotation = -90 if node == 'n1' else (90 if node == last_node_name else 0)
             else:
                 rotation = 0
             supports.append({'node': node, 'type': support_type, 'type_number': type_number, 'rotation': rotation})
         else:
-            print(f"Warning: Unsupported number of constraints ({len(dofs)}) at node {node}")
+            print(f"Warning: Unsupported number of constraints ({len(dof_types)}) at node {node}.")
 
     return supports
 
 
-def prepare_forces(loads, nodes):
+def prepare_forces(loads, nodes, dof_to_node):
     forces = []
     if 'P' in loads:
-        node_idx = (loads['P_loc'] - 1) // 3  # Assuming each node has 3 dofs
-        node_name = nodes[node_idx]['name']
-        rotation = -90 if loads['P'] > 0 else 90
-        distance = -1.6 if loads['P'] > 0 else 0.1
-        forces.append({
-            'node': node_name,
-            'type': 'point',
-            'magnitude': abs(loads['P']),
-            'rotation': rotation,
-            'length': 1.5,
-            'distance': distance
-        })
+        dof_number = loads['P_loc'] + 1
+        if dof_number in dof_to_node:
+            node_info = dof_to_node[dof_number]
+            node_name = node_info['node']
+            rotation = -90 if loads['P'] > 0 else 90
+            distance = -1.6 if loads['P'] > 0 else 0.1
+            forces.append({
+                'node': node_name,
+                'type': 'point',
+                'magnitude': abs(loads['P']),
+                'rotation': rotation,
+                'length': 1.5,
+                'distance': distance
+            })
+        else:
+            print(f"Warning: Degree of freedom {dof_number} was not found in dof_to_node mapping.")
     return forces
 
 
 def prepare_moments(loads, nodes, hinges, dof_to_node):
     moments = []
     if 'M' in loads:
-        dof_number = loads['M_loc']
+        dof_number = loads['M_loc'] + 1
         if dof_number in dof_to_node:
             node_info = dof_to_node[dof_number]
             node_name = node_info['node']
             dof_type = node_info['type']
             orientation = 3 if loads['M'] > 0 else 2  # 2 for CW and 3 for CCW rotation
-
             if node_name in hinges:
-                side = 'left' if (dof_number - 1) % 3 < 1 else 'right'
-                rotation = -90 if side == 'left' else 90
+                side = 'left' if (dof_number) % 3 < 1 else 'right'
+                if side == 'left':
+                    rotation = 90
+                    label_x_offset = -0.55
+                else:
+                    rotation = -90
+                    label_x_offset = 0.55
                 moments.append({
                     'node': node_name,
                     'orientation': orientation,
                     'magnitude': abs(loads['M']),
                     'rotation': rotation,
                     'angle': 200,
-                    'distance': 0.5
+                    'distance': 0.5,
+                    'label_x_offset': label_x_offset,
+                    'label_y_offset': 0.55
                 })
             else:
                 moments.append({
@@ -190,7 +210,9 @@ def prepare_moments(loads, nodes, hinges, dof_to_node):
                     'magnitude': abs(loads['M']),
                     'rotation': 10,
                     'angle': 200,
-                    'distance': 0.5
+                    'distance': 0.5,
+                    'label_x_offset': 0.55,
+                    'label_y_offset': 0.55
                 })
         else:
             print(f"Ostrzeżenie: Stopień swobody {dof_number} nie znaleziony w mapowaniu dof_to_node.")
@@ -199,44 +221,79 @@ def prepare_moments(loads, nodes, hinges, dof_to_node):
 
 def prepare_lineloads(loads, elements):
     lineloads = []
+    if not isinstance(loads['q'], list):
+        loads['q'] = [loads['q']]
+        loads['q_loc'] = [loads['q_loc']]
+
     for q_val, q_range in zip(loads['q'], loads['q_loc']):
         start_node = elements[q_range]['start']
         end_node = elements[q_range]['end']
         value = -0.5 if q_val > 0 else 0.5
         distance = 0.4 if q_val > 0 else -0.1
+        label_y_offset = 1
         lineloads.append({
             'node1': start_node,
             'node2': end_node,
             'type': 'distributed',
             'value': value,
             'distance': distance,
-            'magnitude': abs(q_val)
+            'magnitude': abs(q_val),
+            'label_y_offset': label_y_offset
         })
     return lineloads
 
 
 def prepare_loads(loads, nodes, hinges, elements, dof_to_node):
-    forces = prepare_forces(loads, nodes)
+    forces = prepare_forces(loads, nodes, dof_to_node)
     moments = prepare_moments(loads, nodes, hinges, dof_to_node)
     lineloads = prepare_lineloads(loads, elements)
     return forces, moments, lineloads
 
 
+def calculate_scale_factors(nodes, max_width_cm=15, max_height_cm=4):
+    x_values = [node['x'] for node in nodes]
+    y_values = [node['y'] for node in nodes]
+    x_range = max(x_values) - min(x_values)
+    y_range = max(y_values) - min(y_values)
+    x_scale = max_width_cm / x_range if x_range != 0 else 1
+    y_scale = max_height_cm / y_range if y_range != 0 else 1
+    return x_scale, y_scale
+
+
 def prepare_data_for_latex(beam_version: str, simulation_index, geometry, element_properties, loads):
     nodes, hinges, dof_to_node = prepare_nodes_hinges_and_dof_mapping(geometry)
-    elements = prepare_elements(nodes)
-    supports = determine_supports(geometry, nodes)
+    elements = prepare_elements(geometry, dof_to_node)
+    supports = determine_supports(geometry, nodes, dof_to_node)
     forces, moments, lineloads = prepare_loads(loads, nodes, hinges, elements, dof_to_node)
 
-    materials = [f"{ep['material']['E']/1_000_000:.0f}" for ep in element_properties]
+    materials = [f"{ep['material']['E'] / 1_000_000:.0f}" for ep in element_properties]
     inertias = [f"{ep['section']['I']:.0f}" for ep in element_properties]
-    lengths = [f"{nodes[i + 1]['x'] - nodes[i]['x']:.0f}" for i in range(geometry['nels'])]
+    lengths = []
+    for element in elements:
+        start_node = next(node for node in nodes if node['name'] == element['start'])
+        end_node = next(node for node in nodes if node['name'] == element['end'])
+        length = end_node['x'] - start_node['x']
+        lengths.append(f"{length:.0f}")
+
+    max_width_cm = 15
+    x_scale, y_scale = calculate_scale_factors(nodes, max_width_cm)
 
     return {
-        'beam_version': re.findall("\d+", beam_version)[0], 'simulation_index': f'{simulation_index:03}',
-        'nels': geometry['nels'], 'hinges': hinges, 'nodes': nodes, 'elements': elements,
-        'supports': supports, 'forces': forces, 'moments': moments, 'lineloads': lineloads,
-        'materials': materials, 'inertias': inertias, 'lengths': lengths
+        'beam_version': re.findall("\d+", beam_version)[0],
+        'simulation_index': f'{simulation_index:03}',
+        'nels': len(elements),
+        'hinges': hinges,
+        'nodes': nodes,
+        'elements': elements,
+        'supports': supports,
+        'forces': forces,
+        'moments': moments,
+        'lineloads': lineloads,
+        'materials': materials,
+        'inertias': inertias,
+        'lengths': lengths,
+        'x_scale': x_scale,
+        'y_scale': y_scale
     }
 
 
@@ -247,7 +304,7 @@ if __name__ == '__main__':
     geometry = {'coord': [[0, 0], [3, 0], [3, 0], [6, 0], [9, 0], [12, 0]],
      'dof': [[1, 2, 3], [4, 5, 6], [4, 5, 16], [7, 8, 9], [10, 11, 12], [13, 14, 15]],
      'edof': [[1, 2, 3, 4, 5, 6], [4, 5, 16, 7, 8, 9], [7, 8, 9, 10, 11, 12], [10, 11, 12, 13, 14, 15]],
-     'bc': [1, 8, 13, 14, 15], 'ndofs': 16, 'nels': 4}
+     'bc': [1, 2, 3, 8, 15], 'ndofs': 16, 'nels': 4}
 
     element_properties = [
         {'material': {'type': 'concrete', 'E': 30000000.0}, 'section': {'type': 'square20', 'A': 400, 'I': 13333.3}},
@@ -256,7 +313,7 @@ if __name__ == '__main__':
         {'material': {'type': 'concrete', 'E': 30000000.0}, 'section': {'type': 'square20', 'A': 400, 'I': 13333.3}}
     ]
 
-    loads = {'P': 5, 'P_loc': 4, 'M': 1, 'M_loc': 6, 'q': [-2], 'q_loc': [3]}
+    loads = {'P': 5, 'P_loc': 4, 'M': 1, 'M_loc': 15, 'q': [-2], 'q_loc': [3]}
 
     # data = {
     #     'nels': 6,

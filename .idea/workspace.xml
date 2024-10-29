@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="Most parts are ready in pdf creation, however there is an issue on loads presention where they are sometimes overlapping etc.">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="I think the pdf creation is working quite well. I think I should test it on the random parameters generation now.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/latex_templates/beam_template.tex" beforeDir="false" afterPath="$PROJECT_DIR$/data/latex_templates/beam_template.tex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/properties.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/beam_types.odt" beforeDir="false" afterPath="$PROJECT_DIR$/docs/beam_types.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pdf_generator/pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/pdf_generator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,27 +36,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.Python tests in test_generator.py.executor": "Run",
-    "Python tests.Python tests in test_solver.py.executor": "Run",
-    "Python.generator.executor": "Run",
-    "Python.main --mode predefined.executor": "Run",
-    "Python.main --mode random.executor": "Run",
-    "Python.main.executor": "Debug",
-    "Python.pdf_generator.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/pacho/OneDrive - Politechnika Gdańska/PycharmProjects/problemGeneratorMO_v2/data/latex_templates",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests in test_generator.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_solver.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.generator.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main --mode predefined.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main --mode random.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.pdf_generator.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pacho/OneDrive - Politechnika Gdańska/PycharmProjects/problemGeneratorMO_v2/data/latex_templates&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\pacho\OneDrive - Politechnika Gdańska\PycharmProjects\problemGeneratorMO_v2\data\latex_templates" />
@@ -63,7 +65,7 @@
       <recent name="$PROJECT_DIR$/data/latex_templates" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.pdf_generator">
+  <component name="RunManager" selected="Python.main --mode predefined">
     <configuration name="generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="problemGeneratorMO_v2" />
       <option name="ENV_FILES" value="" />
@@ -103,7 +105,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--mode predefined" />
+      <option name="PARAMETERS" value="--mode predefined --beam_version 998" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -127,7 +129,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--mode random --beam_version 999 --num_simulations 2" />
+      <option name="PARAMETERS" value="--mode random --beam_version 2 --num_simulations 2" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -272,7 +274,7 @@
       <workItem from="1724663807126" duration="755000" />
       <workItem from="1724672207039" duration="1541000" />
       <workItem from="1729581241136" duration="5681000" />
-      <workItem from="1730189556639" duration="14110000" />
+      <workItem from="1730189556639" duration="25941000" />
     </task>
     <task id="LOCAL-00001" summary="Working generator and solver for beams. Not working plotting. Switching to frames.">
       <option name="closed" value="true" />
@@ -330,7 +332,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720105344708</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="I think the pdf creation is working quite well. I think I should test it on the random parameters generation now.">
+      <option name="closed" value="true" />
+      <created>1730206469698</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1730206469698</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -354,14 +364,31 @@
     <MESSAGE value="Internal forces and displacements are working. Now I need to adjust the formatting of annotations and change the sign of moments on the graph." />
     <MESSAGE value="All the plots are working. Now tex and pdf are generated. Now I'm moving to properly preparing the data and generation tikzpicture based on generated data." />
     <MESSAGE value="Most parts are ready in pdf creation, however there is an issue on loads presention where they are sometimes overlapping etc." />
-    <option name="LAST_COMMIT_MESSAGE" value="Most parts are ready in pdf creation, however there is an issue on loads presention where they are sometimes overlapping etc." />
+    <MESSAGE value="I think the pdf creation is working quite well. I think I should test it on the random parameters generation now." />
+    <option name="LAST_COMMIT_MESSAGE" value="I think the pdf creation is working quite well. I think I should test it on the random parameters generation now." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/pdf_generator/pdf_generator.py</url>
+          <line>189</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$.coverage" NAME=" Coverage Results" MODIFIED="1718193392817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$pdf_generator.coverage" NAME="pdf_generator Coverage Results" MODIFIED="1730206027983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/pdf_generator" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1718193184134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$pdf_generator.coverage" NAME="pdf_generator Coverage Results" MODIFIED="1730218403961" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/pdf_generator" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1730215681924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$generator.coverage" NAME="generator Coverage Results" MODIFIED="1717762861756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main.coverage" NAME="main Coverage Results" MODIFIED="1729665997335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1730201862890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1730217773965" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

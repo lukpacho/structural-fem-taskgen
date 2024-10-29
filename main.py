@@ -4,7 +4,7 @@ import os
 from src.generator import load_properties, save_beam_input, generate_geometry, generate_element_properties, generate_loads
 from src.solver.beam_solver import solve_beam
 from src.solver.beam_plotter import plot_beam_results
-from src.pdf_generator.pdf_generator import generate_beam_pdf
+from src.pdf_generator.pdf_generator import prepare_data_for_latex, generate_beam_pdf
 
 
 def run_simulation(beam_version, num_simulations, mode, properties):
@@ -25,7 +25,7 @@ def run_simulation(beam_version, num_simulations, mode, properties):
                 loads = generate_loads(geometry, properties)
                 a, ex, ey, element_results, max_results = solve_beam(geometry, element_properties, loads)
 
-                actual_max_displacement = max_results['ed']
+                actual_max_displacement = max_results['displacement']
                 max_allowed_displacement = max_length / 10
 
                 # Check if the simulation results are within the acceptable range
@@ -36,9 +36,12 @@ def run_simulation(beam_version, num_simulations, mode, properties):
             plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, simulation_index)
 
             # Generate PDF report for the simulation
-            generate_beam_pdf(geometry, element_properties, loads, max_results, mode, beam_version, simulation_index)
+            data = prepare_data_for_latex(beam_version, simulation_index, geometry, element_properties, loads)
+            output_filename = '_'.join([mode, beam_version, str(simulation_index), 'report'])
+            generate_beam_pdf("beam_template.tex", output_filename, data)
 
     elif mode == 'predefined':
+        simulation_index = 0
         geometry = properties[beam_version]['geometry']
         element_properties = properties[beam_version]['element_properties']
         loads = properties[beam_version]['loads']
@@ -48,7 +51,9 @@ def run_simulation(beam_version, num_simulations, mode, properties):
         plot_beam_results(ex, ey, element_results, max_results, mode, beam_version)
 
         # Generate PDF report for the simulation
-        generate_beam_pdf(geometry, element_properties, loads, max_results, mode, beam_version)
+        data = prepare_data_for_latex(beam_version, simulation_index, geometry, element_properties, loads)
+        output_filename = '_'.join([mode, beam_version, str(simulation_index), 'report'])
+        generate_beam_pdf("beam_template.tex", output_filename, data)
 
 
 def main():

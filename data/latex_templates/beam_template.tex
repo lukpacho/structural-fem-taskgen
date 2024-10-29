@@ -10,6 +10,8 @@
 \usepackage{tikz}
 \usepackage{calc}
 \usepackage{xcolor}
+\usepackage{adjustbox}
+
 
 \pagestyle{fancy}
 \fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
@@ -43,7 +45,7 @@
         \item Sporządzić \textbf{rysunek} deformacji układu, oznaczając \textbf{wartości charakterystyczne ugięć} oraz uwzględniając \textbf{obliczone kąty obrotu}.
     \end{itemize}
 
-    Zadanie należy rozwiązać, stosując \textbf{Macierzową Metodę Przemieszczeń} dla elementów belkowych. W analizie numerycznej proszę wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}. Poniższa tabela zawiera dane niezbędne do realizacji zadania:
+    Zadanie należy rozwiązać, stosując \textbf{Macierzową Metodę Przemieszczeń} i element belkowy. W analizie numerycznej proszę wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}. Poniższa tabela zawiera dane niezbędne do realizacji zadania:
 
     \begin{table}[ht]
     \centering
@@ -73,7 +75,7 @@
     Na zadany układ działają następujące obciążenia w postaci
     \BLOCK{ for force in forces}
         \BLOCK{if loop.first}
-            \BLOCK{ if loop.last > 1} sił skupionych
+            \BLOCK{ if loop.length > 1} sił skupionych
             \BLOCK{ else } siły skupionej
             \BLOCK{ endif }
         \BLOCK{ endif }
@@ -83,7 +85,7 @@
     ,
     \BLOCK{ for moment in moments}
         \BLOCK{if loop.first}
-            \BLOCK{ if loop.last > 1} momentów zginających
+            \BLOCK{ if loop.length > 1} momentów zginających
             \BLOCK{ else } momentu zginającego
             \BLOCK{ endif }
         \BLOCK{ endif }
@@ -93,7 +95,7 @@
     oraz
     \BLOCK{ for lineload in lineloads}
         \BLOCK{if loop.first}
-            \BLOCK{ if loop.last > 1} obciążeń liniowych
+            \BLOCK{ if loop.length > 1} obciążeń liniowych
             \BLOCK{ else } obciążenia liniowego
             \BLOCK{ endif }
         \BLOCK{ endif }
@@ -107,35 +109,39 @@
     \noindent\textbf{Schemat układu:}
 
     \begin{center}
-    \begin{tikzpicture}
-        % nodes definition
-        \BLOCK{ for node in nodes }
-            \point{\VAR{node.name}}{\VAR{node.x}}{\VAR{node.y}}
-        \BLOCK{ endfor }
-        % elements definition
-        \BLOCK{ for element in elements }
-            \beam{2}{\VAR{element.start}}{\VAR{element.end}}
-            \notation{4}{\VAR{element.start}}{\VAR{element.end}}[$E_\VAR{loop.index}$, $I_\VAR{loop.index}$][0.5][below=.2mm];
-            \dimensioning{1}{\VAR{element.start}}{\VAR{element.end}}{-1.5}[$L_\VAR{loop.index}$]
-        \BLOCK{ endfor }
-        % hinges definition
-        \BLOCK{ for hinge in hinges }
-            \hinge{1}{\VAR{hinge}}
-        \BLOCK{ endfor }
-        % supports definition
-        \BLOCK{ for support in supports }
-            \support{\VAR{support.type_number}}{\VAR{support.node}}[\VAR{support.rotation}]
-        \BLOCK{ endfor }
-        % loads definition
-        \BLOCK{ for force in forces}
-            \load{1}{\VAR{force.node}}[\VAR{force.rotation}][\VAR{force.length}][\VAR{force.distance}]
-        \BLOCK{ endfor }
-        \BLOCK{ for moment in moments}
-            \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
-        \BLOCK{ endfor }
-        \BLOCK{ for lineload in lineloads}
-            \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}][\VAR{lineload.distance}]
-        \BLOCK{ endfor }
+    \begin{tikzpicture}[x=\VAR{x_scale}cm, y=\VAR{y_scale}cm]
+    % nodes definition
+    \BLOCK{ for node in nodes }
+        \point{\VAR{node.name}}{\VAR{node.x}}{\VAR{node.y}}
+    \BLOCK{ endfor }
+    % elements definition
+    \BLOCK{ for element in elements }
+        \beam{2}{\VAR{element.start}}{\VAR{element.end}}
+        \notation{4}{\VAR{element.start}}{\VAR{element.end}}[$E_\VAR{loop.index}$, $I_\VAR{loop.index}$][0.5][below=.2mm];
+        \dimensioning{1}{\VAR{element.start}}{\VAR{element.end}}{-1.5}[$L_\VAR{loop.index}$]
+    \BLOCK{ endfor }
+    % supports definition
+    \BLOCK{ for support in supports }
+        \support{\VAR{support.type_number}}{\VAR{support.node}}[\VAR{support.rotation}]
+    \BLOCK{ endfor }
+    % hinges definition
+    \BLOCK{ for hinge in hinges }
+        \hinge{1}{\VAR{hinge}}
+    \BLOCK{ endfor }
+    % loads definition
+    \BLOCK{ for force in forces}
+        \load{1}{\VAR{force.node}}[\VAR{force.rotation}][\VAR{force.length}][\VAR{force.distance}]
+        \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (\VAR{force.node}) [shift={(-0.3, \VAR{force.length} + 0.3)}] {$P_\VAR{loop.index}$};
+    \BLOCK{ endfor }
+    \BLOCK{ for moment in moments}
+        \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
+        \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (\VAR{moment.node}) [shift={(\VAR{moment.label_x_offset}, \VAR{moment.label_y_offset})}] {$M_\VAR{loop.index}$};
+    \BLOCK{ endfor }
+    \BLOCK{ for lineload in lineloads}
+        \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}][\VAR{lineload.distance}]
+        \coordinate (midpoint) at ($ (\VAR{lineload.node1})!0.5!(\VAR{lineload.node2}) $);
+        \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (midpoint) [shift={(0, \VAR{lineload.label_y_offset})}] {$q_\VAR{loop.index}$};
+    \BLOCK{ endfor }
     \end{tikzpicture}
     \end{center}
 
@@ -144,7 +150,7 @@
     \noindent\textbf{Wymagane elementy opracowania:}
 
     \begin{enumerate}
-    \item Rysunek układu po dyskretyzacji \dotfill 5 pkt
+    \item Rysunek dyskretyzacji układu \dotfill 5 pkt
     \item Skrypt w MATLAB-ie rozwiązujący zadanie (*.m) \dotfill 5 pkt
     \item Wykresy sił wewnętrznych: siły tnące \(T\) [\si{\kilo\newton}] i momenty zginające \(M\) [\si{\kilo\newton m}] \dotfill 10 pkt
     \item Rysunek deformacji układu [\si{\centi\meter}] \dotfill 5 pkt
@@ -156,7 +162,7 @@
     \begin{itemize}
     \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz rysunek deformacji należy umieścić na odwrocie karty projektowej.
     \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
-    \item Nieprzesłanie skryptu skutkuje przyznaniem 0 punktów za punkty 3. i 4.
+    \item Nieprzesłanie skryptu skutkuje przyznaniem 0 punktów za elementy opracowania nr 3 i 4.
     \end{itemize}
 
 \end{document}
