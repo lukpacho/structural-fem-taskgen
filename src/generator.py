@@ -118,7 +118,8 @@ def generate_geometry(version, properties):
         'bc': bc,
         'ndofs': np.max(dof),
         'nels': n_elements,
-        'L': lengths
+        'L': lengths,
+        'hinges': hinges
     }
     return geometry, max(lengths)
 
@@ -153,37 +154,101 @@ def generate_element_properties(geometry, properties):
     return element_properties
 
 
-def generate_loads(geometry, properties):
+def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
     """
     Generates random loads considering available DOF locations and excluding boundary conditions.
+
+    Parameters:
+    - geometry: dict containing 'dof', 'bc', and 'nels' keys.
+    - properties: dict containing 'loads' key with 'P', 'M', and 'q' load values.
+    - num_P: int, number of point loads to generate.
+    - num_M: int, number of moment loads to generate.
+    - num_q: int, number of distributed loads to generate.
+
+    Returns:
+    - dict containing generated loads and their locations.
     """
+    import copy
+
     dof = geometry['dof']
     bc = geometry['bc']
     n_elements = geometry['nels']
     loads = properties['loads']
 
     # Filter DOF locations that are not restricted by boundary conditions
-    valid_p_locs = [dof[i, 1] for i in range(len(dof)) if dof[i, 1] not in bc]
-    valid_m_locs = [dof[i, 2] for i in range(len(dof)) if dof[i, 2] not in bc]
+    valid_p_dofs = [dof[i, 1]-1 for i in range(len(dof)) if dof[i, 1] not in bc]
+    valid_m_dofs = [dof[i, 2]-1 for i in range(len(dof)) if dof[i, 2] not in bc]
+    valid_q_locs = list(range(n_elements))
 
-    # Remove duplicates from a list
-    valid_p_locs = list(dict.fromkeys(valid_p_locs))
+    # Remove duplicates from the lists (if any)
+    valid_p_dofs = list(dict.fromkeys(valid_p_dofs))
+    valid_m_dofs = list(dict.fromkeys(valid_m_dofs))
+    valid_q_locs = list(dict.fromkeys(valid_q_locs))
 
-    P = random.choice(loads['P'])
-    M = random.choice(loads['M'])
-    q = random.choice(loads['q'])
+    # Initialize lists for loads and their locations
+    P_values, M_values, q_values = [], [], []
+    P_locs, M_locs, q_locs = [], [], []
 
-    P_loc = random.choice(valid_p_locs)-1 if valid_p_locs else None
-    M_loc = random.choice(valid_m_locs)-1 if valid_m_locs else None
-    q_loc = random.randint(0, n_elements-1)  # Continuous loads may apply to any element
+    # Make copies of the valid locations to modify
+    available_p_dofs = copy.deepcopy(valid_p_dofs)
+    available_m_dofs = copy.deepcopy(valid_m_dofs)
+    available_q_locs = copy.deepcopy(valid_q_locs)
+
+    # Build hinge DOF pairs
+    hinge_dof_pairs = {}
+    if 'hinges' in geometry:
+        for hinge_node in geometry['hinges']:
+            left_node = hinge_node
+            right_node = hinge_node + 1  # Assuming the hinge connects node i and node i+1
+            if right_node >= len(dof):
+                continue  # Skip if right_node is out of bounds
+            left_dof = dof[left_node, 2] - 1
+            right_dof = dof[right_node, 2] - 1
+            hinge_dof_pairs[left_dof] = right_dof
+            hinge_dof_pairs[right_dof] = left_dof
+
+    # Generate P loads
+    for _ in range(num_P):
+        if not available_p_dofs:
+            print("No more available DOFs for point loads.")
+            break
+        dof_num = random.choice(available_p_dofs)
+        P_locs.append(dof_num)
+        P_values.append(random.choice(loads['P']))
+        available_p_dofs.remove(dof_num)
+
+    # Generate M loads
+    for _ in range(num_M):
+        if not available_m_dofs:
+            print("No more available DOFs for moment loads.")
+            break
+        dof_num = random.choice(available_m_dofs)
+        M_locs.append(dof_num)
+        M_values.append(random.choice(loads['M']))
+        available_m_dofs.remove(dof_num)
+        # If dof_num is in hinge_dof_pairs, remove the counterpart DOF
+        if dof_num in hinge_dof_pairs:
+            counterpart_dof = hinge_dof_pairs[dof_num]
+            if counterpart_dof in available_m_dofs:
+                available_m_dofs.remove(counterpart_dof)
+
+    # Generate q loads
+    for _ in range(num_q):
+        if not available_q_locs:
+            print("No more available elements for distributed loads.")
+            break
+        loc = random.choice(available_q_locs)
+        q_locs.append(loc)
+        q_values.append(random.choice(loads['q']))
+        available_q_locs.remove(loc)
 
     return {
-        'P': P,
-        'P_loc': P_loc,
-        'M': M,
-        'M_loc': M_loc,
-        'q': q,
-        'q_loc': q_loc
+        'P': P_values,
+        'P_loc': P_locs,
+        'M': M_values,
+        'M_loc': M_locs,
+        'q': q_values,
+        'q_loc': q_locs
     }
 
 

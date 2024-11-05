@@ -23,25 +23,58 @@ def solve_beam(geometry, element_properties, loads):
     ep = np.zeros((nels, 3))
     eq = np.zeros((nels, 2))
 
-    # Apply point loads and moments if they are specified
+    # Apply point loads if specified
     if 'P_loc' in loads and 'P' in loads:
-        if 0 <= loads['P_loc'] < ndofs:
-            f[loads['P_loc'], 0] += loads['P']
-    if 'M_loc' in loads and 'M' in loads:
-        if 0 <= loads['M_loc'] < ndofs:
-            f[loads['M_loc'], 0] += loads['M']
+        P_locs = loads['P_loc']
+        P_values = loads['P']
+        if isinstance(P_locs, int):
+            P_locs = [P_locs]
+            P_values = [P_values]
+        elif isinstance(P_locs, list):
+            pass  # P_locs and P_values are lists
+        else:
+            raise TypeError('Unexpected type for P_loc. Expected int or list.')
+        if len(P_locs) != len(P_values):
+            raise ValueError('P_loc and P must be the same length.')
+        for dof_num, P_value in zip(P_locs, P_values):
+            if 0 <= dof_num < ndofs:
+                f[dof_num, 0] += P_value
 
-    # Apply distributed load if specified
+    # Apply moment loads if specified
+    if 'M_loc' in loads and 'M' in loads:
+        M_locs = loads['M_loc']
+        M_values = loads['M']
+        if isinstance(M_locs, int):
+            M_locs = [M_locs]
+            M_values = [M_values]
+        elif isinstance(M_locs, list):
+            pass  # M_locs and M_values are lists
+        else:
+            raise TypeError('Unexpected type for M_loc. Expected int or list.')
+        if len(M_locs) != len(M_values):
+            raise ValueError('M_loc and M must be the same length.')
+        for dof_num, M_value in zip(M_locs, M_values):
+            if 0 <= dof_num < ndofs:
+                f[dof_num, 0] += M_value
+
+    # Apply distributed loads if specified
     if 'q_loc' in loads and 'q' in loads:
-        if isinstance(loads['q_loc'], int):
-            if 0 <= loads['q_loc'] < nels:
-                eq[loads['q_loc']] += [0, loads['q']]
-        elif isinstance(loads['q_loc'], list):
-            if all(0 < q_loc < nels for q_loc in loads['q_loc']):
-                for q_loc, q in zip(loads['q_loc'], loads['q']):
-                    eq[q_loc] += [0, q]
+        q_locs = loads['q_loc']
+        q_values = loads['q']
+        if isinstance(q_locs, int):
+            q_locs = [q_locs]
+            q_values = [q_values]
+        elif isinstance(q_locs, list):
+            pass  # q_locs and q_values are lists
         else:
             raise TypeError('Unexpected type for q_loc. Expected int or list.')
+        if len(q_locs) != len(q_values):
+            raise ValueError('q_loc and q must be the same length.')
+        for elem_idx, q_value in zip(q_locs, q_values):
+            if 0 <= elem_idx < nels:
+                eq[elem_idx] += [0, q_value]
+            else:
+                print(f"Invalid element index {elem_idx} for distributed load.")
 
     # Extract element properties
     for i in range(nels):

@@ -70,13 +70,13 @@
         "n_elements": 6,
         "lengths": [3.0, 4.0, 5.0],
         "hinges" : [1],
-        "boundary_conditions": [2, 8, 14, 20]
+        "boundary_conditions": [1, 2, 8, 14, 19, 20]
       },
       "beam8": {
         "n_elements": 6,
         "lengths": [3.0, 4.0, 5.0],
         "hinges" : [3],
-        "boundary_conditions": [2, 8, 14, 20]
+        "boundary_conditions": [1, 2, 8, 14, 19, 20]
       },
       "beam999": {
         "n_elements": 4,

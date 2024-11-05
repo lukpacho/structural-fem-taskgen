@@ -2,6 +2,7 @@ import subprocess
 import os
 import shutil
 import re
+import random
 from config import LATEX_TEMPLATES_DIR, PDFS_DIR, TEMP_DIR
 from datetime import datetime
 
@@ -157,65 +158,74 @@ def determine_supports(geometry, nodes, dof_to_node):
 def prepare_forces(loads, nodes, dof_to_node):
     forces = []
     if 'P' in loads:
-        dof_number = loads['P_loc'] + 1
-        if dof_number in dof_to_node:
-            node_info = dof_to_node[dof_number]
-            node_name = node_info['node']
-            rotation = -90 if loads['P'] > 0 else 90
-            distance = -1.6 if loads['P'] > 0 else 0.1
-            forces.append({
-                'node': node_name,
-                'type': 'point',
-                'magnitude': abs(loads['P']),
-                'rotation': rotation,
-                'length': 1.5,
-                'distance': distance
-            })
-        else:
-            print(f"Warning: Degree of freedom {dof_number} was not found in dof_to_node mapping.")
+        if not isinstance(loads['P'], list):
+            loads['P'] = [loads['P']]
+            loads['P_loc'] = [loads['P_loc']]
+        for P_val, P_loc in zip(loads['P'], loads['P_loc']):
+            dof_number = P_loc + 1
+            if dof_number in dof_to_node:
+                node_info = dof_to_node[dof_number]
+                node_name = node_info['node']
+                rotation = -90 if P_val > 0 else 90
+                distance = -1.6 if P_val > 0 else 0.1
+                forces.append({
+                    'node': node_name,
+                    'type': 'point',
+                    'magnitude': abs(P_val),
+                    'rotation': rotation,
+                    'length': 1.5,
+                    'distance': distance
+                })
+            else:
+                print(f"Warning: Degree of freedom {dof_number} was not found in dof_to_node mapping.")
     return forces
 
 
 def prepare_moments(loads, nodes, hinges, dof_to_node):
     moments = []
     if 'M' in loads:
-        dof_number = loads['M_loc'] + 1
-        if dof_number in dof_to_node:
-            node_info = dof_to_node[dof_number]
-            node_name = node_info['node']
-            dof_type = node_info['type']
-            orientation = 3 if loads['M'] > 0 else 2  # 2 for CW and 3 for CCW rotation
-            if node_name in hinges:
-                side = 'left' if (dof_number) % 3 < 1 else 'right'
-                if side == 'left':
-                    rotation = 90
-                    label_x_offset = -0.55
+        if not isinstance(loads['M'], list):
+            loads['M'] = [loads['M']]
+        if not isinstance(loads['M_loc'], list):
+            loads['M_loc'] = [loads['M_loc']]
+        for M_val, M_loc in zip(loads['M'], loads['M_loc']):
+            dof_number = M_loc + 1
+            if dof_number in dof_to_node:
+                node_info = dof_to_node[dof_number]
+                node_name = node_info['node']
+                dof_type = node_info['type']
+                orientation = 3 if M_val > 0 else 2  # 2 for CW and 3 for CCW rotation
+                if node_name in hinges:
+                    side = 'left' if (dof_number) % 3 < 1 else 'right'
+                    if side == 'left':
+                        rotation = 90
+                        label_x_offset = -0.55
+                    else:
+                        rotation = -90
+                        label_x_offset = 0.55
+                    moments.append({
+                        'node': node_name,
+                        'orientation': orientation,
+                        'magnitude': abs(M_val),
+                        'rotation': rotation,
+                        'angle': 200,
+                        'distance': 0.5,
+                        'label_x_offset': label_x_offset,
+                        'label_y_offset': 0.55
+                    })
                 else:
-                    rotation = -90
-                    label_x_offset = 0.55
-                moments.append({
-                    'node': node_name,
-                    'orientation': orientation,
-                    'magnitude': abs(loads['M']),
-                    'rotation': rotation,
-                    'angle': 200,
-                    'distance': 0.5,
-                    'label_x_offset': label_x_offset,
-                    'label_y_offset': 0.55
-                })
+                    moments.append({
+                        'node': node_name,
+                        'orientation': orientation,
+                        'magnitude': abs(M_val),
+                        'rotation': 10,
+                        'angle': 200,
+                        'distance': 0.5,
+                        'label_x_offset': 0.55,
+                        'label_y_offset': 0.55
+                    })
             else:
-                moments.append({
-                    'node': node_name,
-                    'orientation': orientation,
-                    'magnitude': abs(loads['M']),
-                    'rotation': 10,
-                    'angle': 200,
-                    'distance': 0.5,
-                    'label_x_offset': 0.55,
-                    'label_y_offset': 0.55
-                })
-        else:
-            print(f"Ostrzeżenie: Stopień swobody {dof_number} nie znaleziony w mapowaniu dof_to_node.")
+                print(f"Ostrzeżenie: Stopień swobody {dof_number} nie znaleziony w mapowaniu dof_to_node.")
     return moments
 
 
@@ -278,8 +288,12 @@ def prepare_data_for_latex(beam_version: str, simulation_index, geometry, elemen
     max_width_cm = 15
     x_scale, y_scale = calculate_scale_factors(nodes, max_width_cm)
 
+    beam_version_num = re.findall("\d+", beam_version)[0]
+    beam_version_num_hidden = f'{random.randint(10,99)}{beam_version_num}'
+
     return {
-        'beam_version': re.findall("\d+", beam_version)[0],
+        'beam_version_num': beam_version_num,
+        'beam_version_num_hidden': beam_version_num_hidden,
         'simulation_index': f'{simulation_index:03}',
         'nels': len(elements),
         'hinges': hinges,
@@ -313,7 +327,7 @@ if __name__ == '__main__':
         {'material': {'type': 'concrete', 'E': 30000000.0}, 'section': {'type': 'square20', 'A': 400, 'I': 13333.3}}
     ]
 
-    loads = {'P': 5, 'P_loc': 4, 'M': 1, 'M_loc': 15, 'q': [-2], 'q_loc': [3]}
+    loads = {'P': [5, 4], 'P_loc': [4, 7], 'M': [1,3], 'M_loc': [5,15], 'q': [-2], 'q_loc': [3]}
 
     # data = {
     #     'nels': 6,

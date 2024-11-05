@@ -1,5 +1,5 @@
 \documentclass[a4paper,10pt]{article}
-\usepackage[left=25mm,right=25mm,top=25mm,bottom=25mm,bindingoffset=0mm]{geometry}
+\usepackage[left=20mm,right=20mm,top=25mm,bottom=25mm,bindingoffset=0mm]{geometry}
 \usepackage{fontspec}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -16,7 +16,7 @@
 \pagestyle{fancy}
 \fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
 \fancyhead[R]{\small rok. akad. \VAR{academic_year}}
-\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{beam_version}\VAR{simulation_index}}}}
+\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{beam_version_num_hidden}\VAR{simulation_index}}}}
 \fancyfoot[C]{}
 
 \begin{document}
@@ -41,7 +41,7 @@
     Dla przedstawionego układu prętowego należy:
 
     \begin{itemize}
-        \item Wyznaczyć wykresy sił wewnętrznych: sił tnących \(T\) oraz momentów zginających \(M\), \textbf{przedstawione w odpowiednich jednostkach}.
+        \item Wyznaczyć wykresy sił wewnętrznych: sił tnących \(T\) oraz momentów zginających \(M\), \textbf{przedsta\-wione w odpowiednich jednostkach}.
         \item Sporządzić \textbf{rysunek} deformacji układu, oznaczając \textbf{wartości charakterystyczne ugięć} oraz uwzględniając \textbf{obliczone kąty obrotu}.
     \end{itemize}
 
@@ -129,18 +129,18 @@
         \hinge{1}{\VAR{hinge}}
     \BLOCK{ endfor }
     % loads definition
+    \BLOCK{ for lineload in lineloads}
+        \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}][\VAR{lineload.distance}]
+        \coordinate (midpoint) at ($ (\VAR{lineload.node1})!0.5!(\VAR{lineload.node2}) $);
+        \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (midpoint) [shift={(0, \VAR{lineload.label_y_offset})}] {$q_\VAR{loop.index}$};
+    \BLOCK{ endfor }
     \BLOCK{ for force in forces}
         \load{1}{\VAR{force.node}}[\VAR{force.rotation}][\VAR{force.length}][\VAR{force.distance}]
         \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (\VAR{force.node}) [shift={(-0.3, \VAR{force.length} + 0.3)}] {$P_\VAR{loop.index}$};
     \BLOCK{ endfor }
     \BLOCK{ for moment in moments}
-        \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
         \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (\VAR{moment.node}) [shift={(\VAR{moment.label_x_offset}, \VAR{moment.label_y_offset})}] {$M_\VAR{loop.index}$};
-    \BLOCK{ endfor }
-    \BLOCK{ for lineload in lineloads}
-        \lineload{3}{\VAR{lineload.node1}}{\VAR{lineload.node2}}[\VAR{lineload.value}][\VAR{lineload.value}][\VAR{lineload.distance}]
-        \coordinate (midpoint) at ($ (\VAR{lineload.node1})!0.5!(\VAR{lineload.node2}) $);
-        \node[fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt] at (midpoint) [shift={(0, \VAR{lineload.label_y_offset})}] {$q_\VAR{loop.index}$};
+        \load{\VAR{moment.orientation}}{\VAR{moment.node}}[\VAR{moment.rotation}][\VAR{moment.angle}]
     \BLOCK{ endfor }
     \end{tikzpicture}
     \end{center}

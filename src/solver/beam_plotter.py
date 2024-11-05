@@ -1,196 +1,157 @@
 from calfem.vis_mpl import *
-from config import BASE_DIR, ANNOTATION_DISPLACEMENT_MINIMUM, ANNOTATION_THRESHOLD, cm, m_to_cm
+from adjustText import adjust_text
+from config import BASE_DIR, ANNOTATION_DISPLACEMENT_MINIMUM, cm_to_in, m_to_cm
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 def plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, simulation_index=0):
     plt.rcParams.update({'font.size': 9})
     simulation_data = [mode, beam_version, simulation_index]
+    plot_filename = '{}_{}_{}.pdf'.format(*simulation_data)
+    plot_path = os.path.join(BASE_DIR, 'data', 'results', plot_filename)
+    plot_functions = [plot_beam_displacements, plot_beam_shear_forces, plot_beam_moments]
+    plot_titles = ['Displacement, cm', 'Shear Force, kN', 'Moment, kNm']
+    max_result_keys = ['displacement', 'shear_force', 'moment']
 
-    # Plot displacements
-    fig, ax = plt.subplots(figsize=(16 * cm, 8 * cm))
-    plot_beam_displacements(ax, ex, ey, element_results, max_results['displacement'])
-    manage_plot(simulation_data, fig, ax, 'Displacements, cm')
+    # Create a figure with three subplots
+    fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16 * cm_to_in, 25 * cm_to_in))
+    for ax, plot_function, title, key in zip(axes, plot_functions, plot_titles, max_result_keys):
+        plot_function(ax, ex, ey, element_results, max_results[key])
+        ax.axis('off')
+        ax.set_title(title)
 
-    # Plot shear forces
-    fig, ax = plt.subplots(figsize=(16 * cm, 8 * cm))
-    plot_beam_shear_forces(ax, ex, ey, element_results, max_results['shear_force'])
-    manage_plot(simulation_data, fig, ax, 'Shear Forces, kN')
+    plt.tight_layout()
 
-    # Plot moments
-    fig, ax = plt.subplots(figsize=(16 * cm, 8 * cm))
-    plot_beam_moments(ax, ex, ey, element_results, max_results['moment'])
-    manage_plot(simulation_data, fig, ax, 'Moments, kNm')
+    fig.savefig(plot_path, format='pdf')
+    plt.close(fig)
 
 
 def plot_beam_displacements(ax, ex, ey, element_results, max_result):
     scale_factor = scalfact2(ex, ey, max_result, 0.3)
-    eldraw2(ex, ey, [2, 1, 0])  # Line type, line color, node mark
-
-    annotation_positions = []
+    texts = []
+    annotated_positions = set()
     for i, result in element_results.items():
         edi = result['edi']
         dispbeam2_ax(ax, ex[i], ey[i], edi, [1, 2, 3], scale_factor)
-        annotate_displacements(ax, ex[i], ey[i], edi, scale_factor, annotation_positions)
+        annotate_values(ax, ex[i], ey[i], edi[:, 1], scale_factor, texts, annotated_positions,
+                        value_conversion=lambda v: v * m_to_cm)
+    add_annotations(ax, texts)
 
 
 def plot_beam_shear_forces(ax, ex, ey, element_results, max_result):
     scale_factor = scalfact2(ex, ey, max_result, 0.3)
-
-    annotation_positions = []
+    texts = []
+    annotated_positions = set()
     for i, result in element_results.items():
         shear_force = result['es'][:, 1]
-        secforce2_ax_fill(ax, ex[i], ey[i], shear_force, [2, 1],  scale_factor)
-        annotate_internal_forces(ax, ex[i], ey[i], -shear_force, scale_factor, annotation_positions)
+        secforce2_ax_fill(ax, ex[i], ey[i], shear_force, [2, 1], scale_factor)
+        annotate_values(ax, ex[i], ey[i], -shear_force, scale_factor, texts, annotated_positions)
+    add_annotations(ax, texts)
 
 
 def plot_beam_moments(ax, ex, ey, element_results, max_result):
     scale_factor = scalfact2(ex, ey, max_result, 0.3)
-
-    annotation_positions = []
+    texts = []
+    annotated_positions = set()
     for i, result in element_results.items():
         moments = result['es'][:, 2]
-        secforce2_ax_fill(ax, ex[i], ey[i], moments, [2, 1],  scale_factor)
-        annotate_internal_forces(ax, ex[i], ey[i], -moments, scale_factor, annotation_positions)
+        secforce2_ax_fill(ax, ex[i], ey[i], moments, [2, 1], scale_factor)
+        annotate_values(ax, ex[i], ey[i], -moments, scale_factor, texts, annotated_positions)
+    add_annotations(ax, texts)
 
 
-def annotate_displacements(ax, ex, ey, edi, scale_factor, annotation_positions):
-    # Ensure ex and ey have correct sizes reflecting the size of edi
-    n_points = len(edi)
+def annotate_values(ax, ex, ey, data, scale_factor, texts, annotated_positions, value_conversion=None):
+    n_points = len(data)
     x_positions = np.linspace(ex[0], ex[1], n_points)
     y_positions = np.linspace(ey[0], ey[1], n_points)
+    max_idx = np.argmax(data)
+    min_idx = np.argmin(data)
+    indices = [0, len(data) // 2, -1, max_idx, min_idx]  # Indices for start, mid, end, max, and min positions
 
-    # Indices for start, mid, end, max, and min positions
-    max_idx = np.argmax(edi[:, 1])
-    min_idx = np.argmin(edi[:, 1])
-    indices = [0, len(edi) // 2, -1, max_idx, min_idx]
-    positions = [(x_positions[idx], y_positions[idx] + edi[idx, 1] * scale_factor) for idx in indices]
-    displacement_values = [edi[idx, 1] * m_to_cm for idx in indices]  # Convert displacement to cm
+    for idx in indices:
+        position_x = x_positions[idx]
+        position_y = y_positions[idx] + data[idx] * scale_factor
+        value = data[idx]
 
-    for (pos_x, pos_y), displacement_value in zip(positions, displacement_values):
-        if not is_near_other_annotations(pos_x, pos_y, annotation_positions):
-            annotation = adjust_annotation_position(ax, pos_x, pos_y, f'{displacement_value:.2f}', annotation_positions)
-            annotation_positions.append((pos_x, pos_y))
+        if value_conversion:
+            value = value_conversion(value)
 
+        pos_key = (round(position_x, 5), round(position_y, 5))
 
-def annotate_internal_forces(ax, ex, ey, force, scale_factor, annotation_positions):
-    # Ensure ex and ey have correct sizes reflecting the size of force
-    n_points = len(force)
-    x_positions = np.linspace(ex[0], ex[1], n_points)
-    y_positions = np.linspace(ey[0], ey[1], n_points)
+        if pos_key in annotated_positions:
+            continue
 
-    # Max and min force annotations
-    max_idx = np.argmax(force)
-    min_idx = np.argmin(force)
+        annotated_positions.add(pos_key)
 
-    # Annotation indices for start, mid, and end positions
-    indices = [0, len(force) // 2, -1, max_idx, min_idx]
-    positions = [(x_positions[idx], y_positions[idx] + force[idx] * scale_factor) for idx in indices]
-    values = [force[idx] for idx in indices]
+        dx = ex[1] - ex[0]
+        dy = ey[1] - ey[0]
+        offset_magnitude = 0.2 * np.hypot(dx, dy)
 
-    for (pos_x, pos_y), val in zip(positions, values):
-        if not is_near_other_annotations(pos_x, pos_y, annotation_positions):
-            annotation = adjust_annotation_position(ax, pos_x, pos_y, f'{val:.2f}', annotation_positions)
-            annotation_positions.append((pos_x, pos_y))
+        offset_x, offset_y = calculate_offset(dx, dy, value, offset_magnitude)
 
-
-def is_near_plot_edge(pos_x, pos_y, ax, offset=0.1):
-    """ Check if the annotation is near the plot edge """
-    xlim = ax.get_xlim()
-    ylim = ax.get_ylim()
-    return not (xlim[0] + offset < pos_x < xlim[1] - offset and ylim[0] + offset < pos_y < ylim[1] - offset)
+        text = ax.text(
+            position_x + offset_x,
+            position_y + offset_y,
+            f'{np.abs(value):.2f}',
+            ha='center',
+            va='center',
+            bbox=dict(boxstyle="round4,pad=0.2", fc='white', ec='gray', alpha=0.8)
+        )
+        texts.append((text, position_x, position_y))
 
 
-def is_near_other_annotations(pos_x, pos_y, positions, threshold=ANNOTATION_THRESHOLD):
-    return any(np.sqrt((x - pos_x) ** 2 + (y - pos_y) ** 2) < threshold for x, y in positions)
+def calculate_offset(dx, dy, value, offset_magnitude):
+    # Compute unit vectors
+    length = np.hypot(dx, dy) if np.hypot(dx, dy) != 0 else 1e-6
+    unit_tangent_x = dx / length
+    unit_tangent_y = dy / length
+    unit_perp_x = -unit_tangent_y
+    unit_perp_y = unit_tangent_x
 
-
-def adjust_annotation_position(ax, pos_x, pos_y, text, annotation_positions):
-    """Adjust the annotation position if it overlaps with the plot edge or other annotations"""
-    offset = 20
-    predefined_offsets = [(0, offset), (offset, offset), (-offset, offset),
-                          (0, -offset), (offset, -offset), (-offset, -offset)]
-    for offset in predefined_offsets:
-        annotation = ax.annotate(text, xy=(pos_x, pos_y), textcoords="offset points", xytext=offset,
-                                 ha='center', va='bottom', arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color='blue'),
-                                 bbox=dict(boxstyle="round,pad=0.5", facecolor='yellow', edgecolor='black', alpha=0.5))
-        ax.figure.canvas.draw()
-        bbox = annotation.get_window_extent(renderer=ax.figure.canvas.get_renderer())
-
-        # Check if the annotation is near the plot edge or other annotations
-        if not is_near_plot_edge(pos_x + offset[0], pos_y + offset[1], ax):
-            if not is_near_other_annotations(bbox.x0, bbox.y0, annotation_positions):
-                annotation_positions.append((pos_x + offset[0], pos_y + offset[1]))
-                return annotation
-
-        # Remove the annotation if it doesn't fit
-        annotation.remove()
-
-    # If no suitable position found, return the original position
-    return ax.annotate(text, xy=(pos_x, pos_y), textcoords="offset points", xytext=(0, 10), ha='center', va='bottom',
-                       arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color='blue'),
-                       bbox=dict(boxstyle="round,pad=0.5", facecolor='yellow', edgecolor='black', alpha=0.5))
-
-
-def adjust_title_position(ax, title):
-    """Adjust the vertical position of the title to avoid overlapping with annotations."""
-    renderer = ax.figure.canvas.get_renderer()
-    vertical_offset = 1.02  # Start with some basic offset above the top of the axis
-
-    # Create a temporary text object for checking
-    temp_title = ax.text(0.5, vertical_offset, title, transform=ax.transAxes, ha='center', va='top')
-
-    # Incrementally test for overlaps, increasing the offset until there are no overlaps
-    while vertical_offset < 1.2:  # Limit to reasonable height above the plot
-        temp_title.set_position((0.5, vertical_offset))  # Update y position of temporary title
-        title_bbox = temp_title.get_window_extent(renderer=renderer)
-        annotations = [child for child in ax.get_children() if isinstance(child, matplotlib.text.Annotation)]
-        overlaps = any(
-            title_bbox.overlaps(annotation.get_window_extent(renderer=renderer)) for annotation in annotations)
-
-        if not overlaps:
-            break  # If no overlaps, we've found a good vertical position
-        vertical_offset += 0.02  # Increase offset to try higher position
-
-    # Remove the temporary text object after position determination
-    temp_title.remove()
-
-    # Set the actual title at the final determined vertical position
-    ax.set_title(title, loc='center', y=vertical_offset)
-
-
-def manage_plot(simulation_data, fig, ax, title, axis=False, save_format='png', show=True, tight_layout=True):
-    """
-    Manage the plotting operations like setting titles, saving, and displaying.
-
-    Args:
-        simulation_data (list): List containing mode, beam_version, and simulation_index
-        fig (matplotlib.figure.Figure): The figure object.
-        ax (matplotlib.axes.Axes): The axes object for the plot.
-        title (str): Title of the plot.
-        axis (bool): Whether the plot should be drawn on the axis or not.
-        save_format (str): Format in which the plot will be saved ('png', 'pdf', etc.).
-        show (bool): Whether to display the plot.
-        tight_layout (bool): Whether to apply tight_layout to the figure.
-    """
-    if not axis:
-        ax.axis('off')
-
-    if title:
-        adjust_title_position(ax, title)
-
-    if tight_layout:
-        plt.tight_layout()
-
-    if save_format:
-        plot_type = title.split(',')[0].lower()
-        plot_filename = '{}_{}_{}_{}'.format(*simulation_data, plot_type)
-        plot_path = os.path.join(BASE_DIR, 'data', 'results', plot_filename)
-        fig.savefig(f'{plot_path}.{save_format}', dpi=600)
-
-    if show:
-        plt.show()
+    # Determine horizontal offset based on beam slope
+    if dy > 0:
+        offset_x = -offset_magnitude * abs(unit_perp_x)  # Push left
+    elif dy < 0:
+        offset_x = offset_magnitude * abs(unit_perp_x)   # Push right
     else:
-        plt.close(fig)
+        offset_x = 0  # No horizontal offset
+
+    # Determine vertical offset based on value position
+    if value >= 0:
+        offset_y = offset_magnitude * abs(unit_perp_y)   # Push up
+    else:
+        offset_y = -offset_magnitude * abs(unit_perp_y)  # Push down
+
+    return offset_x, offset_y
+
+
+def add_annotations(ax, texts):
+    text_objects = [text for text, _, _ in texts]
+    adjust_text(
+        text_objects,
+        ax=ax,
+        expand_text=(1.25, 1.25),
+        force_text=(0.5, 0.5),
+        force_points=(0.2, 0.5),
+        min_arrow_len=0.001,
+        lim=1000
+    )
+
+    for text, position_x, position_y in texts:
+        text_pos = text.get_position()
+        ax.annotate(
+            '',
+            xy=(position_x, position_y),
+            xytext=text_pos,
+            arrowprops=dict(
+                arrowstyle="->",
+                color='gray',
+                lw=1.1,
+                shrinkA=4,
+                shrinkB=0,
+                alpha=0.6
+            )
+        )
 
 
 def dispbeam2_ax(ax, ex, ey, edi, plotpar=[2, 1, 1], sfac=None):
@@ -276,6 +237,9 @@ def dispbeam2_ax(ax, ex, ey, edi, plotpar=[2, 1, 1], sfac=None):
     yc = np.array(A[:, 1])
 
     ax.plot(xc, yc, color=line_color, linewidth=1)
+
+    # Plot element
+    ax.plot(ex, ey, color='black', linewidth=1)
 
     A1 = np.array([A[0, 0], A[Nbr - 1, 0]]).reshape(1, 2)
     A2 = np.array([A[0, 1], A[Nbr - 1, 1]]).reshape(1, 2)
