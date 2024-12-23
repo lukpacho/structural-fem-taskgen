@@ -1,10 +1,10 @@
 # main.py
 import argparse
 import os
-from src.generator import load_properties, save_beam_input, generate_geometry, generate_element_properties, generate_loads
+from src.generators.beam_generator import load_properties, save_beam_input, generate_geometry, generate_element_properties, generate_loads
 from src.solver.beam_solver import solve_beam
 from src.solver.beam_plotter import plot_beam_results
-from src.pdf_generator.pdf_generator import prepare_data_for_latex, generate_beam_pdf
+from src.pdf_generator.beam_pdf_generator import prepare_data_for_latex, generate_beam_pdf
 
 
 def run_simulation(beam_version, num_simulations, mode, generate_pdf, properties):
@@ -75,10 +75,14 @@ def main():
     properties_path = os.path.join(current_dir, 'data', 'properties.json')
     properties = load_properties(properties_path)[args.mode]
 
-    for version in args.beam_version:
-        beam_version = f'beam{int(version[0])}'
+    if args.mode == 'random':
+        for version in args.beam_version:
+            beam_version = f'beam{int(version[0])}'
+            run_simulation(beam_version, args.num_simulations, args.mode, args.generate_pdf, properties)
+    elif args.mode == 'predefined':
+        beam_number = ''.join(args.beam_version[0])
+        beam_version = f'beam{int(beam_number)}'
         run_simulation(beam_version, args.num_simulations, args.mode, args.generate_pdf, properties)
-
 
 if __name__ == '__main__':
     main()

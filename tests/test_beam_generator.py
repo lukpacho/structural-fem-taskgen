@@ -3,7 +3,7 @@ import json
 import os
 import numpy as np
 from unittest.mock import patch
-from src.generator import generate_geometry, generate_element_properties, generate_loads
+from src.generators.beam_generator import generate_geometry, generate_element_properties, generate_loads
 
 
 class TestGenerator(unittest.TestCase):

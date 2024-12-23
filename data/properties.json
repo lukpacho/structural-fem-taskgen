@@ -1,12 +1,12 @@
 {
   "random": {
     "materials": {
-    "steel": {"E": 200e6},
-    "iron": {"E": 190e6},
-    "aluminium": {"E": 70e6},
-    "glass": {"E": 50e6},
-    "concrete": {"E": 30e6},
-    "oak": {"E": 12e6}
+    "steel": {"E": 200e6, "nu":  0.3},
+    "iron": {"E": 190e6, "nu": 0.26},
+    "aluminium": {"E": 70e6, "nu":  0.32},
+    "glass": {"E": 50e6, "nu":  0.22},
+    "concrete": {"E": 30e6, "nu": 0.2},
+    "oak": {"E": 12e6, "nu":  0.25}
     },
     "sections": {
       "HEB120": {"A": 34, "I": 864},
@@ -83,6 +83,24 @@
         "lengths": [3.0],
         "hinges" : [1],
         "boundary_conditions": [1, 2, 3, 8, 14]
+      }
+    },
+    "plane_configurations": {
+      "plane_999": {
+        "ptype": 2,
+        "geometry": {
+          "points": [[0,0],[3,0],[3,1],[0,1]]
+        },
+        "thickness_range": [0.1, 0.5],
+        "boundary_conditions": {
+          "fixed_lines": [2],
+          "roller_lines": [],
+          "fixed_nodes": [],
+          "roller_horizontal_nodes": [],
+          "roller_vertical_nodes": [],
+          "prescribed_displacement_horizontal_nodes": [],
+          "prescribed_displacement_vertical_nodes" : []
+        }
       }
     }
   },
@@ -172,6 +190,30 @@
         "M": -15,
         "q_loc": [3, 4],
         "q": [-10, -10]
+      }
+    },
+    "plane_999": {
+      "element_type": 2,
+      "dofs_per_node": 2,
+      "h_max": 0.5,
+      "ptype": 1,
+      "materials": "steel",
+      "geometry": {
+        "points": [[3,0], [3,1], [2,1], [1,1], [0,1], [0,0], [1,0], [2,0]]
+      },
+      "thickness": 0.1,
+      "boundary_conditions": {
+          "fixed_lines": [4],
+          "roller_lines": [],
+          "fixed_nodes": [],
+          "roller_horizontal_nodes": [],
+          "roller_vertical_nodes": [],
+          "prescribed_displacement_horizontal_nodes": [],
+          "prescribed_displacement_vertical_nodes" : []
+        },
+      "loads": {
+        "P_loc": ["0_horizontal", "1_horizontal"],
+        "P_val": [100, 100]
       }
     }
   }
