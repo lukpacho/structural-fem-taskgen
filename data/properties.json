@@ -87,19 +87,60 @@
     },
     "plane_configurations": {
       "plane_999": {
-        "ptype": 2,
-        "geometry": {
-          "points": [[0,0],[3,0],[3,1],[0,1]]
+        "el_type": 2,
+        "dofs_per_node": 2,
+        "el_size_factor": 0.1,
+        "material_data": {
+          "ptype": 1,
+          "E": 50e6,
+          "nu": 0.3,
+          "t": 0.1
         },
-        "thickness_range": [0.1, 0.5],
-        "boundary_conditions": {
-          "fixed_lines": [2],
-          "roller_lines": [],
-          "fixed_nodes": [],
-          "roller_horizontal_nodes": [],
-          "roller_vertical_nodes": [],
-          "prescribed_displacement_horizontal_nodes": [],
-          "prescribed_displacement_vertical_nodes" : []
+        "geometry": {
+          "points": [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [2.0, 0.0],
+            [3.0, 0.0],
+            [3.0, 1.0],
+            [2.0, 1.0],
+            [1.0, 1.0],
+            [0.0, 1.0]
+        ],
+          "elements": [
+            [1, 7, 8],
+            [1, 2, 7],
+            [2, 6, 7],
+            [2, 3, 6],
+            [3, 5, 6],
+            [3, 4, 5]
+          ],
+          "boundary_conditions": {
+            "bc1": {
+              "type": "line",
+              "edge": 8,
+              "points": [8, 1],
+              "marker": 10,
+              "value": 0.0,
+              "dimension": 0
+            }
+          },
+          "loads": {
+            "force1": {
+                "type": "point",
+                "point": 4,
+                "marker": 1,
+                "value": 100.0,
+                "dimension": 1
+            },
+            "force2": {
+                "type": "point",
+                "point": 5,
+                "marker": 2,
+                "value": -100.0,
+                "dimension": 1
+            }
+          }
         }
       }
     }

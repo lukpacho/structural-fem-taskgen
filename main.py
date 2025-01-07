@@ -5,6 +5,9 @@ from src.generators.beam_generator import load_properties, save_beam_input, gene
 from src.solver.beam_solver import solve_beam
 from src.solver.beam_plotter import plot_beam_results
 from src.pdf_generator.beam_pdf_generator import prepare_data_for_latex, generate_beam_pdf
+import warnings
+warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
 
 
 def run_simulation(beam_version, num_simulations, mode, generate_pdf, properties):
