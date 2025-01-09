@@ -189,72 +189,247 @@
     },
     "beam998": {
       "geometry": {
-        "coord": [[0, 0],
-                  [4, 0],
-                  [6, 0],
-                  [8, 0],
-                  [11, 0],
-                  [11, 0],
-                  [16, 0]],
-        "dof": [[1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-                [10, 11, 12],
-                [13, 14, 15],
-                [13, 14, 19],
-                [16, 17, 18]],
-        "edof": [[1, 2, 3, 4, 5, 6],
-                 [4, 5, 6, 7, 8, 9],
-                 [7, 8, 9, 10, 11, 12],
-                 [10, 11, 12, 13, 14, 15],
-                 [13, 14, 19, 16, 17, 18]],
-        "bc": [1, 2, 14, 16, 17, 18],
+        "coord": [
+          [
+            0,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            8,
+            0
+          ],
+          [
+            11,
+            0
+          ],
+          [
+            11,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ],
+        "dof": [
+          [
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            7,
+            8,
+            9
+          ],
+          [
+            10,
+            11,
+            12
+          ],
+          [
+            13,
+            14,
+            15
+          ],
+          [
+            13,
+            14,
+            19
+          ],
+          [
+            16,
+            17,
+            18
+          ]
+        ],
+        "edof": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          [
+            13,
+            14,
+            19,
+            16,
+            17,
+            18
+          ]
+        ],
+        "bc": [
+          1,
+          2,
+          14,
+          16,
+          17,
+          18
+        ],
         "ndofs": 19,
         "nels": 5
       },
       "element_properties": [
-        {"material": {"type": "aluminium", "E": 70e6},
-         "section": {"type": "square15", "A": 225, "I": 4218.8}},
-        {"material": {"type": "aluminium", "E": 70e6},
-         "section": {"type": "square15", "A": 225, "I": 4218.8}},
-        {"material": {"type": "aluminium", "E": 70e6},
-         "section": {"type": "square15", "A": 225, "I": 4218.8}},
-        {"material": {"type": "iron", "E": 190e6},
-         "section": {"type": "rectangle12x20", "A": 240, "I": 8000}},
-        {"material": {"type": "steel", "E": 200e6},
-         "section": {"type": "IPE240", "A": 39, "I": 3890}}
+        {
+          "material": {
+            "type": "aluminium",
+            "E": 70e6
+          },
+          "section": {
+            "type": "square15",
+            "A": 225,
+            "I": 4218.8
+          }
+        },
+        {
+          "material": {
+            "type": "aluminium",
+            "E": 70e6
+          },
+          "section": {
+            "type": "square15",
+            "A": 225,
+            "I": 4218.8
+          }
+        },
+        {
+          "material": {
+            "type": "aluminium",
+            "E": 70e6
+          },
+          "section": {
+            "type": "square15",
+            "A": 225,
+            "I": 4218.8
+          }
+        },
+        {
+          "material": {
+            "type": "iron",
+            "E": 190e6
+          },
+          "section": {
+            "type": "rectangle12x20",
+            "A": 240,
+            "I": 8000
+          }
+        },
+        {
+          "material": {
+            "type": "steel",
+            "E": 200e6
+          },
+          "section": {
+            "type": "IPE240",
+            "A": 39,
+            "I": 3890
+          }
+        }
       ],
       "loads": {
         "P_loc": 4,
         "P": 10,
         "M_loc": 8,
         "M": -15,
-        "q_loc": [3, 4],
+        "q_loc": [3, 4        ],
         "q": [-10, -10]
       }
     },
-    "plane_999": {
-      "element_type": 2,
+    "plane999": {
+      "el_type": 2,
       "dofs_per_node": 2,
-      "h_max": 0.5,
-      "ptype": 1,
-      "materials": "steel",
-      "geometry": {
-        "points": [[3,0], [3,1], [2,1], [1,1], [0,1], [0,0], [1,0], [2,0]]
+      "el_size_factor": 0.1,
+      "material_data": {
+        "ptype": 1,
+        "E": 50e6,
+        "nu": 0.3,
+        "t": 0.1
       },
-      "thickness": 0.1,
-      "boundary_conditions": {
-          "fixed_lines": [4],
-          "roller_lines": [],
-          "fixed_nodes": [],
-          "roller_horizontal_nodes": [],
-          "roller_vertical_nodes": [],
-          "prescribed_displacement_horizontal_nodes": [],
-          "prescribed_displacement_vertical_nodes" : []
+      "geometry": {
+        "points": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [2.0, 0.0],
+          [3.0, 0.0],
+          [3.0, 1.0],
+          [2.0, 1.0],
+          [1.0, 1.0],
+          [0.0, 1.0]
+        ],
+        "elements": [
+          [1, 7, 8],
+          [1, 2, 7],
+          [2, 6, 7],
+          [2, 3, 6],
+          [3, 5, 6],
+          [3, 4, 5]
+        ],
+        "boundary_conditions": {
+          "bc1": {
+            "type": "line",
+            "edge": 8,
+            "points": [8, 1],
+            "marker": 10,
+            "value": 0.0,
+            "dimension": 0
+          }
         },
-      "loads": {
-        "P_loc": ["0_horizontal", "1_horizontal"],
-        "P_val": [100, 100]
+        "loads": {
+          "force1": {
+              "type": "point",
+              "point": 4,
+              "marker": 1,
+              "value": 100.0,
+              "dimension": 1
+          },
+          "force2": {
+              "type": "point",
+              "point": 5,
+              "marker": 2,
+              "value": -100.0,
+              "dimension": 1
+          }
+        }
       }
     }
   }

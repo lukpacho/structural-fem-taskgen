@@ -1,15 +1,93 @@
-%! Author = lukpacho
-%! Date = 20.12.2024
-
-% Preamble
-\documentclass[11pt]{article}
-
-% Packages
+\documentclass[a4paper,10pt]{article}
+\usepackage[left=20mm,right=20mm,top=25mm,bottom=25mm,bindingoffset=0mm]{geometry}
+\usepackage{fontspec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage[detect-all=true]{siunitx}
+\usepackage{stanli}
 \usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{calc}
+\usepackage{xcolor}
+\usepackage{adjustbox}
+
+
+\pagestyle{fancy}
+\fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
+\fancyhead[R]{\small rok. akad. \VAR{academic_year}}
+%\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{beam_version_num_hidden}\VAR{simulation_index}}}}
+\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): plane\_version\_num\_hidden simulation\_index}}
+\fancyfoot[C]{}
+
 
 % Document
 \begin{document}
 
+\begin{center}
+    {\Large \textbf{Podstawy Mechaniki Komputerowej - Projekt}}
+    \end{center}
 
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{
+            m{.175\textwidth}m{.215\textwidth}m{.175\textwidth}m{.175\textwidth}m{.1\textwidth}}
+        \toprule
+        Imię & Nazwisko & Numer albumu & Numer grupy  & Ocena \\ \midrule
+             &          &              &              &       \\ \bottomrule
+        \end{tabular}
+        \label{tab:dane_studenta}
+    \end{table}
+
+    \noindent\textbf{Treść zadania:} \vspace{1mm}
+
+    Dla przedstawionego układu prętowego należy:
+
+    \begin{itemize}
+        \item Wyznaczyć wykresy sił wewnętrznych: sił tnących \(T\) oraz momentów zginających \(M\), \textbf{przedsta\-wione w odpowiednich jednostkach}.
+        \item Sporządzić \textbf{rysunek} deformacji układu, oznaczając \textbf{wartości charakterystyczne ugięć} oraz uwzględniając \textbf{obliczone kąty obrotu}.
+    \end{itemize}
+
+    Zadanie należy rozwiązać, stosując trójkątny element skończony (CST) w \textbf{Płaskim Stanie Naprężenia (PSN)/Płaskim Stanie Odkształcenia (PSO)}. W analizie numerycznej proszę wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}. Poniższa tabela zawiera dane niezbędne do realizacji zadania:
+
+    \begin{table}[ht]
+    \centering
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{lll}
+    \toprule
+    Długość [\si{m}] &
+            \\
+    Moduł Younga [\si{GPa}] &
+            \\
+    Moment bezwładności [\si{\centi\meter^4}] &
+            \\
+    \bottomrule
+    \end{tabular}
+    \label{tab:dane_zadania2}
+    \end{table}
+
+    \vspace{5mm}
+
+    \noindent\textbf{Schemat układu:}
+
+    \vspace{5mm}
+
+    \noindent\textbf{Wymagane elementy opracowania:}
+
+    \begin{enumerate}
+    \item Rysunek dyskretyzacji układu \dotfill 5 pkt
+    \item Skrypt w MATLAB-ie rozwiązujący zadanie (*.m) \dotfill 5 pkt
+    \item Wykresy sił wewnętrznych: siły tnące \(T\) [\si{\kilo\newton}] i momenty zginające \(M\) [\si{\kilo\newton m}] \dotfill 10 pkt
+    \item Rysunek deformacji układu [\si{\centi\meter}] \dotfill 5 pkt
+    \end{enumerate}
+
+    \vspace{5mm}
+
+    \noindent\textbf{Uwagi:}
+    \begin{itemize}
+    \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz rysunek deformacji należy umieścić na odwrocie karty projektowej.
+    \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
+    \item Nieprzesłanie skryptu skutkuje przyznaniem 0 punktów za elementy opracowania nr 3 i 4.
+    \end{itemize}
 
 \end{document}

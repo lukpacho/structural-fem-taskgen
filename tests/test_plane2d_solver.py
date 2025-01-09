@@ -1,8 +1,9 @@
 import unittest
 import os
-import itertools
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
 # CalFEM for Python
 import calfem.core as cfc
@@ -11,42 +12,8 @@ import calfem.mesh as cfm
 import calfem.vis_mpl as cfv
 
 from config import BASE_DIR, cm_to_in
-from src.solver.plane2d_solver import solve_plane2d
-
-
-def draw_node_numbers(ax, coords, color='blue'):
-    """
-    Draw node numbering at each (x,y) in coords with a white-translucent box.
-    """
-    offset_x = 0.1
-    offset_y = 0.1
-    for i, (x, y) in enumerate(coords):
-        ax.text(
-            x + offset_x, y + offset_y, str(i + 1),
-            color=color,
-            ha='center', va='center',
-            bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'),
-            zorder=5
-        )
-
-
-def draw_element_numbers(ax, ex, ey, color='red'):
-    """
-    Draw element numbering near each element's centroid with a white-translucent box.
-
-    ex, ey shape: (n_elements, n_nodes_per_element)
-    We'll label each element i with its index i+1 at the centroid.
-    """
-    for i in range(ex.shape[0]):
-        cx = np.mean(ex[i])
-        cy = np.mean(ey[i])
-        ax.text(
-            cx, cy, str(i + 1),
-            color=color,
-            ha='center', va='center',
-            bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'),
-            zorder=5
-        )
+from src.solver.plane2d_solver import solve_plane2d, build_plane2d_with_predefined_mesh
+from src.solver.plane2d_plotter import plot_predefined_mesh_with_numbering
 
 
 class TestPlane2DSolver(unittest.TestCase):
@@ -127,57 +94,13 @@ class TestPlane2DSolver(unittest.TestCase):
             }
         }
 
-        # --------------------------------------------
-        # 2) BUILD PREDEFINED MESH COORD & EDOF ARRAYS
-        # --------------------------------------------
-        coords= np.array(points)
-        n_nodes = len(coords)
+        coords, dofs, edofs, bdofs = build_plane2d_with_predefined_mesh(points, elements, boundary_conditions, loads)
 
-        # We'll define dofs for each node as (2i+1, 2i+2) => 1-based DOF indices
-        dofs = np.array([[2 * node + 1, 2 * node + 2] for node in range(n_nodes)], dtype=int)
-
-        # Build edofs array from the elements
-        edofs_list = []
-        for elem in elements:
-            n1, n2, n3 = (elem[0] - 1, elem[1] - 1, elem[2] - 1)
-            edofs_list.append([*dofs[n1], *dofs[n2], *dofs[n3]])
-        edofs = np.array(edofs_list, dtype='int32')
-
-        # Build bdofs from boundary_conditions & loads
-        bdofs = {}
-        # 2a) Boundary conditions
-        for _, bc_data in boundary_conditions.items():
-            marker = bc_data["marker"]
-            dofs_of_points = []
-            for pt in bc_data["points"]:
-                point_id = pt - 1  # bc_data["points"] node IDs => 1-based
-                dofs_of_points.append(dofs[point_id].tolist())
-            bdofs[int(marker)] = list(itertools.chain(*dofs_of_points))
-
-        # 2b) Loads
-        for _, force_data in loads.items():
-            marker = force_data["marker"]
-            point_id = force_data["point"] - 1  # 0-based
-            bdofs[int(marker)] = dofs[point_id].tolist()
+        simulation_data = ["test", "test", "test"]
+        plot_predefined_mesh_with_numbering(coords, dofs, edofs, dofs_per_node, el_type, simulation_data)
 
         # -----------------------------------------
-        # 3) PLOT PREDEFINED MESH WITH NUMBERING
-        # -----------------------------------------
-        ex, ey = cfc.coordxtr(edofs, coords, dofs)
-
-        fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
-        cfv.draw_mesh(coords, edofs, dofs_per_node, el_type, filled=True)
-        cfv.draw_node_circles(ex, ey, filled=True, marker_type='.')
-        draw_node_numbers(ax, coords, color='blue')
-        draw_element_numbers(ax, ex, ey, color='red')
-
-        # Save figure
-        temp_fig_path = os.path.join(BASE_DIR, "data", "temp", "cantilever_mesh_predefined.pdf")
-        fig.savefig(temp_fig_path, format='pdf')
-        plt.close(fig)
-
-        # -----------------------------------------
-        # 4) SOLVE THE PREDEFINED MESH
+        # SOLVE THE PREDEFINED MESH
         # -----------------------------------------
         a, r, es, ed = solve_plane2d(
             coords, dofs, edofs, bdofs,

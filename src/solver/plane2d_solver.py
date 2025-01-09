@@ -101,3 +101,82 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
     es = np.array(es_list)  # (n_elements, 3)
 
     return a, r, es, ed
+
+
+def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_conditions: dict, loads: dict):
+    """
+    Build a plane stress/strain problem given a meshed geometry.
+    """
+    # --------------------------------------------
+    # BUILD PREDEFINED MESH COORD & EDOF ARRAYS
+    # --------------------------------------------
+    coords = np.array(points)
+    n_nodes = len(coords)
+
+    # We'll define dofs for each node as (2i+1, 2i+2) => 1-based DOF indices
+    dofs = np.array([[2 * node + 1, 2 * node + 2] for node in range(n_nodes)], dtype=int)
+
+    # Build edofs array from the elements
+    edofs_list = []
+    for elem in elements:
+        n1, n2, n3 = (elem[0] - 1, elem[1] - 1, elem[2] - 1)
+        edofs_list.append([*dofs[n1], *dofs[n2], *dofs[n3]])
+    edofs = np.array(edofs_list, dtype='int32')
+
+    # Build bdofs from boundary_conditions & loads
+    bdofs = {}
+    import itertools
+    # Boundary conditions
+    for _, bc_data in boundary_conditions.items():
+        marker = bc_data["marker"]
+        dofs_of_points = []
+        for pt in bc_data["points"]:
+            point_id = pt - 1  # bc_data["points"] node IDs => 1-based
+            dofs_of_points.append(dofs[point_id].tolist())
+        bdofs[int(marker)] = list(itertools.chain(*dofs_of_points))
+
+    # Loads
+    for _, force_data in loads.items():
+        marker = force_data["marker"]
+        point_id = force_data["point"] - 1  # 0-based
+        bdofs[int(marker)] = dofs[point_id].tolist()
+
+    return coords, dofs, edofs, bdofs
+
+# def build_plane2d_with_auto_mesh(points: list, elements: list, boundary_conditions: dict, loads: dict):
+#     g = cfg.geometry()
+#
+#     for (x, y) in coords:
+#         g.point([x, y])
+#
+#     # Assign point markers for loads
+#     for _, force_data in loads.items():
+#         marker = force_data["marker"]
+#         point_id = force_data["point"] - 1  # 0-based
+#         g.setPointMarker(ID=point_id, marker=marker)
+#
+#     n_points_geom = len(g.points)
+#
+#     # Build splines in a loop => closed loop
+#     for i in range(n_points_geom):
+#         start_node = i
+#         end_node = (i + 1) % n_points_geom
+#         g.spline([start_node, end_node])
+#
+#     # Mark a specific curve if desired:
+#     for _, bc_data in boundary_conditions.items():
+#         edge_id = bc_data["edge"] - 1  # user gave "edge":8 => 1-based
+#         marker = bc_data["marker"]
+#         g.setCurveMarker(ID=edge_id, marker=marker)
+#
+#     # Create a surface from all curves
+#     g.surface(list(g.curves.keys()))
+#
+#     # Create the mesh
+#     mesh = cfm.GmshMesh(g)
+#     mesh.el_type = el_type
+#     mesh.dofs_per_node = dofs_per_node
+#     mesh.el_size_factor = el_size_factor
+#
+#     coords_auto, edofs_auto, dofs_auto, bdofs_auto, emarkers_auto = mesh.create()
+#     pass
