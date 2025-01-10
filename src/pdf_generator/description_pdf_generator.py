@@ -1,10 +1,14 @@
-import subprocess
 import os
+import subprocess
 import shutil
 import re
 import random
-from config import LATEX_TEMPLATES_DIR, PDFS_DIR, TEMP_DIR
 from datetime import datetime
+
+from src.solver.plane2d_plotter import plot_predefined_mesh
+
+
+from config import LATEX_TEMPLATES_DIR, PDFS_DIR, TEMP_DIR
 
 
 def latex_jinja_env(template_folder=LATEX_TEMPLATES_DIR):
@@ -60,7 +64,7 @@ def compile_latex_to_pdf(output_name):
         os.remove(os.path.join(TEMP_DIR, file))
 
 
-def generate_beam_pdf(template_file, output_name, data):
+def generate_description_pdf(template_file, output_name, data):
     """
     Generate a PDF report from a LaTeX template and provided data.
     :param template_file: Path to the Jinja2 templated LaTeX file.
@@ -270,7 +274,7 @@ def calculate_scale_factors(nodes, max_width_cm=15, max_height_cm=4):
     return x_scale, y_scale
 
 
-def prepare_data_for_latex(beam_version: str, simulation_index, geometry, element_properties, loads):
+def prepare_beam_data_for_latex(beam_version: str, simulation_index, geometry, element_properties, loads):
     nodes, hinges, dof_to_node = prepare_nodes_hinges_and_dof_mapping(geometry)
     elements = prepare_elements(geometry, dof_to_node)
     supports = determine_supports(geometry, nodes, dof_to_node)
@@ -311,6 +315,63 @@ def prepare_data_for_latex(beam_version: str, simulation_index, geometry, elemen
     }
 
 
+def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, simulation_data, coords, dofs, edofs,
+                                   material_data, boundary_conditions, forces, mesh_props):
+    analysis_type = 'Płaskim Stanie Naprężenia (PSN)'
+    ptype = material_data['ptype']
+    if ptype == 2:
+        analysis_type = 'Płaskin Stanie Odkształcenia (PSO)'
+    elif not ptype == 1:
+        analysis_type = 'Błąd. Nie rozpoznano typu analizy.'
+
+    plot_path = plot_predefined_mesh(coords, dofs, edofs, mesh_props, (plane2d_version, simulation_index, 'mesh'))
+
+    plane2d_version_num = re.findall("\d+", plane2d_version)[0]
+    plane2d_version_num_hidden = f'{random.randint(10, 99)}{plane2d_version_num}'
+
+    forces_list = []
+    for _, force in forces.items():
+        direction = 'poziomym'
+        if force['dimension'] == 2:
+            direction = 'pionowym'
+        elif force['dimension'] != 1:
+            direction = 'Błąd. Zły kierunek działania siły.'
+        forces_list.append({
+            'point': force['point'],
+            'value': force['value'],
+            'direction': direction
+        })
+
+    bc_list = []
+    for _, bc in boundary_conditions.items():
+        direction = 'obu kierunkach'
+        if bc['dimension'] == 1:
+            direction = 'kierunku poziomym'
+        elif bc['dimension'] == 2:
+            direction = 'kierunku pionowym'
+        elif bc['dimension'] != 0:
+            direction = 'Błąd. Zły kierunek podparcia.'
+        bc_list.append({
+            'point1': bc['points'][0],
+            'point2': bc['points'][1],
+            'direction': direction
+        })
+
+    return {
+        'plane2d_version_num': plane2d_version_num,
+        'plane2d_version_num_hidden': plane2d_version_num_hidden,
+        'simulation_index': f'{simulation_index:03}',
+        'analysis_type': analysis_type,
+        'el_size_factor': mesh_props['el_size_factor'],
+        't': material_data['t']*1000,  #convert m to mm
+        'E': material_data['E']/1_000_000,  #convert kPa to GPa
+        'nu': material_data['nu'],
+        'forces': forces_list,
+        'bc_list': bc_list,
+        'plot_path': plot_path
+    }
+
+
 if __name__ == '__main__':
     beam_version = 'beam999'
     simulation_index = f'{1:03}'
@@ -339,6 +400,6 @@ if __name__ == '__main__':
     #     'load': {'P': f"{50:.0f}", 'M': f"{20:.0f}", 'q': f"{-10:.0f}"}
     # }
 
-    data = prepare_data_for_latex(beam_version, simulation_index, geometry, element_properties, loads)
+    data = prepare_beam_data_for_latex(beam_version, simulation_index, geometry, element_properties, loads)
 
-    generate_beam_pdf("beam_template.tex", "output_beam_report", data)
+    generate_description_pdf("beam_template.tex", "output_beam_report", data)

@@ -16,8 +16,7 @@
 \pagestyle{fancy}
 \fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
 \fancyhead[R]{\small rok. akad. \VAR{academic_year}}
-%\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{beam_version_num_hidden}\VAR{simulation_index}}}}
-\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): plane\_version\_num\_hidden simulation\_index}}
+\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): \VAR{plane2d_version_num_hidden}\VAR{simulation_index}}}}
 \fancyfoot[C]{}
 
 
@@ -41,36 +40,37 @@
 
     \noindent\textbf{Treść zadania:} \vspace{1mm}
 
-    Dla przedstawionego układu prętowego należy:
-
+    Dla przedstawionego układu w \textbf{\VAR{analysis_type}} należy:
     \begin{itemize}
-        \item Wyznaczyć wykresy sił wewnętrznych: sił tnących \(T\) oraz momentów zginających \(M\), \textbf{przedsta\-wione w odpowiednich jednostkach}.
-        \item Sporządzić \textbf{rysunek} deformacji układu, oznaczając \textbf{wartości charakterystyczne ugięć} oraz uwzględniając \textbf{obliczone kąty obrotu}.
+        \item Wyznaczyć wartości przemieszczeń poziomych $u$ oraz pionowych $v$, w oznaczonych miejscach na rysunku.
+        \item Wyznaczyć \textbf{maksymalną} \textbf{bezwzględną} wartość naprężeń normalnych $max(|\sigma|)$ ($\sigma_x$ lub $\sigma_y$).
     \end{itemize}
 
-    Zadanie należy rozwiązać, stosując trójkątny element skończony (CST) w \textbf{Płaskim Stanie Naprężenia (PSN)/Płaskim Stanie Odkształcenia (PSO)}. W analizie numerycznej proszę wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}. Poniższa tabela zawiera dane niezbędne do realizacji zadania:
-
-    \begin{table}[ht]
-    \centering
-    \renewcommand{\arraystretch}{1.25}
-    \begin{tabular}{lll}
-    \toprule
-    Długość [\si{m}] &
-            \\
-    Moduł Younga [\si{GPa}] &
-            \\
-    Moment bezwładności [\si{\centi\meter^4}] &
-            \\
-    \bottomrule
-    \end{tabular}
-    \label{tab:dane_zadania2}
-    \end{table}
+    Zadanie należy rozwiązać, stosując trójkątny element skończony (CST) zarówno dla \textbf{A)} siatki przedstawionej na rysunku, jak i dla \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{max} = \VAR{el_size_factor} \si{m}$.  Konstrukcja ma grubość $t = \VAR{t} \si{mm}$ i wykonano ją z materiału o parametrach $E = \VAR{E} \si{GPa}$ oraz $\nu = \VAR{nu}$. Zadany układ podparty jest na krawędzi pomiędzy węzłami
+    \BLOCK{ for bc in bc_list}
+        \VAR{bc.point1} oraz \VAR{bc.point2} na \VAR{bc.direction}%
+    \BLOCK{ endfor }. 
+    Działają na niego obciążenia w postaci 
+    \BLOCK{ for force in forces}
+        \BLOCK{if loop.first}
+            \BLOCK{ if loop.length > 1} sił skupionych: 
+            \BLOCK{ else } siły skupionej
+            \BLOCK{ endif }
+        \BLOCK{ endif }
+        $P_\VAR{loop.index} = \VAR{force.value} \si{\kilo\newton}$ w węźle \VAR{force.point} na kierunku \VAR{force.direction}%
+        \BLOCK{ if not loop.last }, \BLOCK{ endif }
+    \BLOCK{ endfor }.
 
     \vspace{5mm}
 
-    \noindent\textbf{Schemat układu:}
+    \noindent\textbf{Schemat układu} (wymiary w metrach):
 
     \vspace{5mm}
+
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=0.8\textwidth]{\VAR{plot_path}}
+    \end{figure}
 
     \noindent\textbf{Wymagane elementy opracowania:}
 
@@ -85,8 +85,8 @@
 
     \noindent\textbf{Uwagi:}
     \begin{itemize}
-    \item Rysunek dyskretyzacji, wykresy sił tnących, momentów zginających oraz rysunek deformacji należy umieścić na odwrocie karty projektowej.
-    \item Skrypt rozwiązujący zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
+    \item W analizie numerycznej należy wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}.
+    \item Skrypt/skrypty rozwiązujące zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
     \item Nieprzesłanie skryptu skutkuje przyznaniem 0 punktów za elementy opracowania nr 3 i 4.
     \end{itemize}
 

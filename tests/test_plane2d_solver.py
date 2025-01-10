@@ -12,25 +12,20 @@ import calfem.mesh as cfm
 import calfem.vis_mpl as cfv
 
 from config import BASE_DIR, cm_to_in
-from src.solver.plane2d_solver import solve_plane2d, build_plane2d_with_predefined_mesh
-from src.solver.plane2d_plotter import plot_predefined_mesh_with_numbering
+from src.solver.plane2d_solver import solve_plane2d, build_plane2d_with_predefined_mesh, build_plane2d_with_auto_mesh
+from src.solver.plane2d_plotter import plot_predefined_mesh, plot_auto_mesh
 
 
 class TestPlane2DSolver(unittest.TestCase):
     def test_cantilever_example(self):
-        """
-        1) Use a predefined mesh (coords, elements).
-        2) Solve the plane problem.
-        3) Plot with node & element numbering in different colors.
-        4) Then build a geometry for Gmsh, solve again with a smaller el_size_factor, plot, etc.
-        """
-
         # -----------------------------
         # 1) SETUP PROBLEM DEFINITIONS
         # -----------------------------
-        el_type = 2  # 2 = Triangles, 3 = Quads
-        dofs_per_node = 2
-        el_size_factor = 0.1
+        mesh_props = {
+            "el_type": 2,  # 2 = Triangles, 3 = Quads
+            "dofs_per_node": 2,
+            "el_size_factor": 0.1
+        }
 
         material_data = {
             "ptype": 1,  # plane stress (or 2 for plane strain)
@@ -93,14 +88,18 @@ class TestPlane2DSolver(unittest.TestCase):
                 "dimension": 1
             }
         }
-
-        coords, dofs, edofs, bdofs = build_plane2d_with_predefined_mesh(points, elements, boundary_conditions, loads)
-
         simulation_data = ["test", "test", "test"]
-        plot_predefined_mesh_with_numbering(coords, dofs, edofs, dofs_per_node, el_type, simulation_data)
 
         # -----------------------------------------
-        # SOLVE THE PREDEFINED MESH
+        # 2.1) BUILD PREDEFINED MESH & PLOT
+        # -----------------------------------------
+        coords, dofs, edofs, bdofs = build_plane2d_with_predefined_mesh(
+            points, elements, boundary_conditions, loads
+        )
+        plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data)
+
+        # -----------------------------------------
+        # 2.2) SOLVE THE PREDEFINED MESH
         # -----------------------------------------
         a, r, es, ed = solve_plane2d(
             coords, dofs, edofs, bdofs,
@@ -118,53 +117,15 @@ class TestPlane2DSolver(unittest.TestCase):
             self.assertAlmostEqual(values_to_test[i], reference_values[i], places=9)
 
         # -----------------------------------------
-        # 5) BUILD GMSH-BASED MESH (AUTO) & PLOT
+        # 3.1) BUILD GMSH-BASED MESH (AUTO) & PLOT
         # -----------------------------------------
-        g = cfg.geometry()
-
-        for (x, y) in coords:
-            g.point([x, y])
-
-        # Assign point markers for loads
-        for _, force_data in loads.items():
-            marker = force_data["marker"]
-            point_id = force_data["point"] - 1  # 0-based
-            g.setPointMarker(ID=point_id, marker=marker)
-
-        n_points_geom = len(g.points)
-
-        # Build splines in a loop => closed loop
-        for i in range(n_points_geom):
-            start_node = i
-            end_node = (i + 1) % n_points_geom
-            g.spline([start_node, end_node])
-
-        # Mark a specific curve if desired:
-        for _, bc_data in boundary_conditions.items():
-            edge_id = bc_data["edge"] - 1  # user gave "edge":8 => 1-based
-            marker = bc_data["marker"]
-            g.setCurveMarker(ID=edge_id, marker=marker)
-
-        # Create a surface from all curves
-        g.surface(list(g.curves.keys()))
-
-        # Create the mesh
-        mesh = cfm.GmshMesh(g)
-        mesh.el_type = el_type
-        mesh.dofs_per_node = dofs_per_node
-        mesh.el_size_factor = el_size_factor
-
-        coords_auto, edofs_auto, dofs_auto, bdofs_auto, emarkers_auto = mesh.create()
-
-        # Plot the automatically generated mesh
-        fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
-        cfv.draw_mesh(coords_auto, edofs_auto, dofs_per_node, el_type=el_type, filled=True)
-        temp_fig_path = os.path.join(BASE_DIR, "data", "temp", "cantilever_mesh_auto.pdf")
-        fig.savefig(temp_fig_path, format='pdf')
-        plt.close(fig)
+        coords_auto, dofs_auto, edofs_auto, bdofs_auto = build_plane2d_with_auto_mesh(
+            points, boundary_conditions, loads, mesh_props
+        )
+        plot_auto_mesh(coords_auto, edofs_auto, mesh_props, simulation_data)
 
         # -----------------------------------------
-        # 6) SOLVE THE AUTO-GENERATED MESH
+        # 3.2) SOLVE THE AUTO-GENERATED MESH
         # -----------------------------------------
         a_auto, r_auto, es_auto, ed_auto = solve_plane2d(
             coords_auto, dofs_auto, edofs_auto, bdofs_auto,

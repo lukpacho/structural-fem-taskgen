@@ -49,7 +49,10 @@ def draw_element_numbers(ax, ex, ey, color='red'):
         )
 
 
-def plot_predefined_mesh_with_numbering(coords, dofs, edofs, dofs_per_node, el_type, simulation_data):
+def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
+    dofs_per_node = mesh_props['dofs_per_node']
+    el_type = mesh_props['el_type']
+
     ex, ey = cfc.coordxtr(edofs, coords, dofs)
 
     fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
@@ -59,7 +62,23 @@ def plot_predefined_mesh_with_numbering(coords, dofs, edofs, dofs_per_node, el_t
     draw_element_numbers(ax, ex, ey, color='red')
 
     # Save figure
-    plot_filename = '{}_{}_{}.pdf'.format(*simulation_data)
-    plot_path = os.path.join(BASE_DIR, "data", "frame_descriptions", plot_filename)
+    plane2d_version, simulation_index, plot_type = simulation_data
+    plot_filename = f"{plane2d_version}_{simulation_index}_{plot_type}.pdf"
+    plot_path = os.path.join(BASE_DIR, "data", "temp", plot_filename)
+    fig.savefig(plot_path, format='pdf')
+    plt.close(fig)
+
+    return plot_path
+
+
+def plot_auto_mesh(coords, edofs, mesh_props, simulation_data):
+    dofs_per_node = mesh_props['dofs_per_node']
+    el_type = mesh_props['el_type']
+    fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
+    cfv.draw_mesh(coords, edofs, dofs_per_node, el_type=el_type, filled=True)
+
+    # Save figure
+    plot_filename = '{}_{}_{}_mesh_auto.pdf'.format(*simulation_data)
+    plot_path = os.path.join(BASE_DIR, "data", "temp", plot_filename)
     fig.savefig(plot_path, format='pdf')
     plt.close(fig)

@@ -1,10 +1,13 @@
 import numpy as np
 
+# CalFEM for Python
 import calfem.core as cfc
+import calfem.geometry as cfg
+import calfem.mesh as cfm
 import calfem.utils as cfu
 
 
-def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions, loads):
+def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions, forces):
     """
     Solve a 2D plane stress/strain problem given a meshed geometry.
 
@@ -29,7 +32,7 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
               "bc1": { "marker": 10, "value": 0.0, "dimension": 0 },
               ...
             }
-    loads : dict
+    forces : dict
         For example:
             {
               "force1": { "marker": 1, "value": 100.0, "dimension": 1 },
@@ -83,7 +86,7 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
         bc, bcVal = cfu.applybc(bdofs, bc, bcVal, marker, value, dimension)
 
     # Apply loads
-    for force_key, force_data in loads.items():
+    for force_key, force_data in forces.items():
         marker = force_data["marker"]
         value = force_data["value"]
         dimension = force_data["dimension"]
@@ -103,7 +106,7 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
     return a, r, es, ed
 
 
-def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_conditions: dict, loads: dict):
+def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_conditions: dict, forces: dict):
     """
     Build a plane stress/strain problem given a meshed geometry.
     """
@@ -136,47 +139,63 @@ def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_co
         bdofs[int(marker)] = list(itertools.chain(*dofs_of_points))
 
     # Loads
-    for _, force_data in loads.items():
+    for _, force_data in forces.items():
         marker = force_data["marker"]
         point_id = force_data["point"] - 1  # 0-based
         bdofs[int(marker)] = dofs[point_id].tolist()
 
     return coords, dofs, edofs, bdofs
 
-# def build_plane2d_with_auto_mesh(points: list, elements: list, boundary_conditions: dict, loads: dict):
-#     g = cfg.geometry()
-#
-#     for (x, y) in coords:
-#         g.point([x, y])
-#
-#     # Assign point markers for loads
-#     for _, force_data in loads.items():
-#         marker = force_data["marker"]
-#         point_id = force_data["point"] - 1  # 0-based
-#         g.setPointMarker(ID=point_id, marker=marker)
-#
-#     n_points_geom = len(g.points)
-#
-#     # Build splines in a loop => closed loop
-#     for i in range(n_points_geom):
-#         start_node = i
-#         end_node = (i + 1) % n_points_geom
-#         g.spline([start_node, end_node])
-#
-#     # Mark a specific curve if desired:
-#     for _, bc_data in boundary_conditions.items():
-#         edge_id = bc_data["edge"] - 1  # user gave "edge":8 => 1-based
-#         marker = bc_data["marker"]
-#         g.setCurveMarker(ID=edge_id, marker=marker)
-#
-#     # Create a surface from all curves
-#     g.surface(list(g.curves.keys()))
-#
-#     # Create the mesh
-#     mesh = cfm.GmshMesh(g)
-#     mesh.el_type = el_type
-#     mesh.dofs_per_node = dofs_per_node
-#     mesh.el_size_factor = el_size_factor
-#
-#     coords_auto, edofs_auto, dofs_auto, bdofs_auto, emarkers_auto = mesh.create()
-#     pass
+
+def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces: dict, mesh_props: dict):
+    g = cfg.geometry()
+
+    for (x, y) in points:
+        g.point([x, y])
+
+    # Assign point markers for loads
+    for _, force_data in forces.items():
+        marker = force_data["marker"]
+        point_id = force_data["point"] - 1  # 0-based
+        g.setPointMarker(ID=point_id, marker=marker)
+
+    n_points_geom = len(g.points)
+
+    # Build splines in a loop => closed loop
+    for i in range(n_points_geom):
+        start_node = i
+        end_node = (i + 1) % n_points_geom
+        g.spline([start_node, end_node])
+
+    # Mark a specific curve if desired:
+    for _, bc_data in boundary_conditions.items():
+        edge_id = bc_data["edge"] - 1  # user gave "edge":8 => 1-based
+        marker = bc_data["marker"]
+        g.setCurveMarker(ID=edge_id, marker=marker)
+
+    # Create a surface from all curves
+    g.surface(list(g.curves.keys()))
+
+    # Create the mesh
+    mesh = cfm.GmshMesh(g)
+    mesh.el_type = mesh_props.get("el_type")
+    mesh.dofs_per_node = mesh_props.get("dofs_per_node")
+    mesh.el_size_factor = mesh_props.get("el_size_factor")
+
+    coords, edofs, dofs, bdofs, emarkers = mesh.create()
+    return coords, dofs, edofs, bdofs
+
+
+def load_plane2d_version_properties(properties: dict, plane_version: str):
+    plane_data = properties[plane_version]
+    points = plane_data['points']
+    elements = plane_data['elements']
+    material_data = plane_data['material_data']
+    boundary_conditions = plane_data['boundary_conditions']
+    loads = plane_data['forces']
+    mesh_props = {
+        "el_type": plane_data["el_type"],
+        "dofs_per_node": plane_data["dofs_per_node"],
+        "el_size_factor": plane_data["el_size_factor"]
+    }
+    return points, elements, material_data, boundary_conditions, loads, mesh_props
