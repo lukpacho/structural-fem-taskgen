@@ -80,6 +80,7 @@ def run_plane2d_simulation(properties: dict, plane2d_version: str,
         generate_pdf (bool): Whether to generate PDF documents.
     """
     if mode == 'random':
+
         pass
     elif mode == 'predefined':
         simulation_index = 0

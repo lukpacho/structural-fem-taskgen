@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="Currently I'm working on implementing plane2d solving and task description pdf plotting in main.py. I stopped at build_plane2d_with_auto_mesh function.">
+    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="Still working on the plane2d_template.tex to generate task description">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/properties.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pdf_generator/beam_pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pdf_generator/plane2d_pdf_generator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pdf_generator/plane2d_template.tex" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/plane2d_template.tex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/solver/plane2d_plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solver/plane2d_plotter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/solver/plane2d_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solver/plane2d_solver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_plane2d_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_plane2d_solver.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -321,7 +318,8 @@
       <workItem from="1736243008324" duration="18910000" />
       <workItem from="1736326336429" duration="4189000" />
       <workItem from="1736421369296" duration="9715000" />
-      <workItem from="1736495253159" duration="16771000" />
+      <workItem from="1736495253159" duration="17057000" />
+      <workItem from="1736600909176" duration="7694000" />
     </task>
     <task id="LOCAL-00001" summary="Working generator and solver for beams. Not working plotting. Switching to frames.">
       <option name="closed" value="true" />
@@ -427,7 +425,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736437810982</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Still working on the plane2d_template.tex to generate task description">
+      <option name="closed" value="true" />
+      <created>1736521852292</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1736521852292</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -457,7 +463,8 @@
     <MESSAGE value="Adding the functionality of solving plane2d stress/strain problems." />
     <MESSAGE value="The solving works for both, the predefined and auto meshing. Now I need to add plotting functionality and then solving and plotting for the randomly generated inputs." />
     <MESSAGE value="Currently I'm working on implementing plane2d solving and task description pdf plotting in main.py. I stopped at build_plane2d_with_auto_mesh function." />
-    <option name="LAST_COMMIT_MESSAGE" value="Currently I'm working on implementing plane2d solving and task description pdf plotting in main.py. I stopped at build_plane2d_with_auto_mesh function." />
+    <MESSAGE value="Still working on the plane2d_template.tex to generate task description" />
+    <option name="LAST_COMMIT_MESSAGE" value="Still working on the plane2d_template.tex to generate task description" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -477,18 +484,13 @@
           <line>56</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py</url>
-          <line>359</line>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main.coverage" NAME="main Coverage Results" MODIFIED="1729665997335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1734702330156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main_plane2d_predefined.coverage" NAME="main plane2d predefined Coverage Results" MODIFIED="1736521738484" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main_plane2d_predefined.coverage" NAME="main plane2d predefined Coverage Results" MODIFIED="1736606128202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$.coverage" NAME=" Coverage Results" MODIFIED="1736499297500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1734702310475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$generator.coverage" NAME="generator Coverage Results" MODIFIED="1717762861756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />

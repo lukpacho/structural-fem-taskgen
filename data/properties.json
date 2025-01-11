@@ -86,61 +86,44 @@
       }
     },
     "plane_configurations": {
-      "plane_999": {
+      "plane999": {
         "el_type": 2,
         "dofs_per_node": 2,
         "el_size_factor": 0.1,
-        "material_data": {
-          "ptype": 1,
-          "E": 50e6,
-          "nu": 0.3,
-          "t": 0.1
-        },
-        "geometry": {
-          "points": [
-            [0.0, 0.0],
-            [1.0, 0.0],
-            [2.0, 0.0],
-            [3.0, 0.0],
-            [3.0, 1.0],
-            [2.0, 1.0],
-            [1.0, 1.0],
-            [0.0, 1.0]
+        "points": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [2.0, 0.0],
+          [3.0, 0.0],
+          [3.0, 1.0],
+          [2.0, 1.0],
+          [1.0, 1.0],
+          [0.0, 1.0]
+      ],
+        "elements": [
+          [1, 7, 8],
+          [1, 2, 7],
+          [2, 6, 7],
+          [2, 3, 6],
+          [3, 5, 6],
+          [3, 4, 5]
         ],
-          "elements": [
-            [1, 7, 8],
-            [1, 2, 7],
-            [2, 6, 7],
-            [2, 3, 6],
-            [3, 5, 6],
-            [3, 4, 5]
-          ],
-          "boundary_conditions": {
-            "bc1": {
-              "type": "line",
-              "edge": 8,
-              "points": [8, 1],
-              "marker": 10,
-              "value": 0.0,
-              "dimension": 0
-            }
-          },
-          "forces": {
-            "force1": {
-                "type": "point",
-                "point": 4,
-                "marker": 1,
-                "value": 100.0,
-                "dimension": 1
-            },
-            "force2": {
-                "type": "point",
-                "point": 5,
-                "marker": 2,
-                "value": -100.0,
-                "dimension": 1
-            }
+        "boundary_conditions": {
+          "bc1": {
+            "type": "line",
+            "possible_edges": [8, 4],
+            "corresponding_points": [[8, 1], [4, 5]],
+            "marker": 10,
+            "value": 0.0,
+            "dimension": 0
           }
+        },
+        "forces": {
+          "number_of_forces": 2,
+          "type": "point",
+          "possible_points": [1, 2, 3, 4, 5, 6, 7, 8],
+          "force_range": [10, 10000],
+          "possible_dimensions": [1, 2]
         }
       }
     }

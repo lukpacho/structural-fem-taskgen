@@ -73,6 +73,8 @@ def generate_description_pdf(template_file, output_name, data):
     """
     current_year = datetime.now().year
     academic_year = f"{current_year}/{current_year + 1}"
+    if datetime.now().month < 6:
+        academic_year = f"{current_year - 1}/{current_year}"
     data.update({
         'academic_year': academic_year
     })
@@ -344,11 +346,11 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
 
     bc_list = []
     for _, bc in boundary_conditions.items():
-        direction = 'obu kierunkach'
+        direction = 'w obu kierunkach'
         if bc['dimension'] == 1:
-            direction = 'kierunku poziomym'
+            direction = 'na kierunku poziomym'
         elif bc['dimension'] == 2:
-            direction = 'kierunku pionowym'
+            direction = 'na kierunku pionowym'
         elif bc['dimension'] != 0:
             direction = 'Błąd. Zły kierunek podparcia.'
         bc_list.append({
