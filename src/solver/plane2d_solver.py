@@ -1,3 +1,6 @@
+import os
+import json
+import itertools
 import numpy as np
 
 # CalFEM for Python
@@ -6,6 +9,7 @@ import calfem.geometry as cfg
 import calfem.mesh as cfm
 import calfem.utils as cfu
 
+from config import BASE_DIR
 
 def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions, forces):
     """
@@ -49,6 +53,17 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
         Element stress array, shape (n_elements, 3) => [σx, σy, τxy]
     ed : ndarray
         Element displacement array, shape (n_elements, n_dofs_per_el)
+    result_summary: dict
+        {
+           'max_u_val': float,
+           'max_u_node': int,
+           'max_v_val': float,
+           'max_v_node': int,
+           'max_sx_val': float,
+           'max_sx_elem': int,
+           'max_sy_val': float,
+           'max_sy_elem': int
+         }
     """
 
     # -- Extract material data --
@@ -103,7 +118,60 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
         es_list.append(es_i[0]) # es_i is shape (1,3) => [σx, σy, τxy]
     es = np.array(es_list)  # (n_elements, 3)
 
-    return a, r, es, ed
+    # 1) find max abs horizontal/vertical displacement
+    # "a" is shape (n_dofs,1). Node i => dofs[ i,0 ] => a-index => a[...] for x, dofs[i,1] => a[...] for y
+    # We'll parse
+    # Example: node i => x-dof => dofs[i,0]-1 => index in a
+    #           node i => y-dof => dofs[i,1]-1 => index in a
+    # We'll track max absolute
+    max_u_val = 0.0
+    max_u_node = 1
+    max_v_val = 0.0
+    max_v_node = 1
+    for i_node in range(coords.shape[0]):
+        # x dof
+        a_index_x = dofs[i_node, 0] - 1
+        a_index_y = dofs[i_node, 1] - 1
+        ux = a[a_index_x, 0]
+        vy = a[a_index_y, 0]
+        if abs(ux) > abs(max_u_val):
+            max_u_val = ux
+            max_u_node = i_node + 1  # 1-based node index
+        if abs(vy) > abs(max_v_val):
+            max_v_val = vy
+            max_v_node = i_node + 1
+
+    # 2) find max abs sigma_x & sigma_y
+    # es[:,0] => sigma_x, es[:,1]=>sigma_y
+    # track element indices as well
+    max_sx_val = 0.0
+    max_sx_elem = 1
+    max_sy_val = 0.0
+    max_sy_elem = 1
+    for i_el in range(es.shape[0]):
+        sx = es[i_el, 0]
+        sy = es[i_el, 1]
+        if abs(sx) > abs(max_sx_val):
+            max_sx_val = sx
+            max_sx_elem = i_el + 1  # 1-based
+        if abs(sy) > abs(max_sy_val):
+            max_sy_val = sy
+            max_sy_elem = i_el + 1
+
+    result_summary = {
+        'max_u_val': float(max_u_val),
+        'max_u_node': max_u_node,
+        'max_v_val': float(max_v_val),
+        'max_v_node': max_v_node,
+        'max_sx_val': float(max_sx_val),
+        'max_sx_elem': max_sx_elem,
+        'max_sy_val': float(max_sy_val),
+        'max_sy_elem': max_sy_elem,
+        'nnodes': coords.shape[0],
+        'nels': edofs.shape[0],
+    }
+
+    return a, r, es, ed, result_summary
 
 
 def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_conditions: dict, forces: dict):
@@ -150,14 +218,8 @@ def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_co
 def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces: dict, mesh_props: dict):
     g = cfg.geometry()
 
-    for (x, y) in points:
-        g.point([x, y])
-
-    # Assign point markers for loads
-    for _, force_data in forces.items():
-        marker = force_data["marker"]
-        point_id = force_data["point"] - 1  # 0-based
-        g.setPointMarker(ID=point_id, marker=marker)
+    for node_id, (x, y) in enumerate(points):
+        g.point([x, y], marker=node_id+1)  # 1-based marked
 
     n_points_geom = len(g.points)
 
@@ -165,13 +227,7 @@ def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces
     for i in range(n_points_geom):
         start_node = i
         end_node = (i + 1) % n_points_geom
-        g.spline([start_node, end_node])
-
-    # Mark a specific curve if desired:
-    for _, bc_data in boundary_conditions.items():
-        edge_id = bc_data["edge"] - 1  # user gave "edge":8 => 1-based
-        marker = bc_data["marker"]
-        g.setCurveMarker(ID=edge_id, marker=marker)
+        g.spline([start_node, end_node], marker=i+101)  # curves are marked 1-based with a 100 offset
 
     # Create a surface from all curves
     g.surface(list(g.curves.keys()))
@@ -216,3 +272,105 @@ def load_plane2d_configuration(properties: dict, plane_version: str, mode: str):
         return points, elements, material_options, boundary_conditions, forces, mesh_props
     else:
         raise ValueError("Unknown mode")
+
+
+def save_plane2d_input_and_results(simulation_data, data_to_save):
+    data_to_save["a"] = list(itertools.chain(*data_to_save["a"]))
+    mode, plane2d_version, simulation_index = simulation_data
+    results_dir = os.path.join(BASE_DIR, 'data', 'results')
+    os.makedirs(results_dir, exist_ok=True)
+
+    results_filename = '_'.join([mode, plane2d_version, str(simulation_index), 'results']) + '.json'
+    results_path = os.path.join(results_dir, results_filename)
+
+    with open(results_path, 'w', encoding='utf-8') as f_out:
+        json.dump(data_to_save, f_out, indent=2)
+
+
+def find_displacement_at_predefined_nodes_in_auto_mesh(coords_pre, result_summary, coords_auto, dofs_auto, a_auto):
+    """
+    For each node in predefined coords, find the closest node in auto mesh and
+    return that node's horizontal & vertical displacement from a_auto.
+    """
+    results = []
+    for i_pre, (x_pre, y_pre) in enumerate(coords_pre):
+        # find closest node in coords_auto
+        best_index = None
+        best_dist_sq = float('inf')
+        for i_auto, (x_auto, y_auto) in enumerate(coords_auto):
+            dx = x_auto - x_pre
+            dy = y_auto - y_pre
+            dist_sq = dx * dx + dy * dy
+            if dist_sq < best_dist_sq:
+                best_dist_sq = dist_sq
+                best_index = i_auto
+
+        # once found best_index in auto mesh
+        i_node_auto = best_index
+        a_index_x = dofs_auto[i_node_auto, 0] - 1
+        a_index_y = dofs_auto[i_node_auto, 1] - 1
+        ux_auto = a_auto[a_index_x, 0]
+        vy_auto = a_auto[a_index_y, 0]
+
+        results.append({
+            "i_pre_node": i_pre + 1,
+            "pre_node_coords": [float(x_pre), float(y_pre)],
+            "auto_node_index": i_node_auto + 1,
+            "auto_node_coords": [float(coords_auto[i_node_auto, 0]), float(coords_auto[i_node_auto, 1])],
+            "ux_auto": float(ux_auto),
+            "vy_auto": float(vy_auto),
+            "distance": float(np.sqrt(best_dist_sq))
+        })
+    u_node = result_summary['max_u_node']
+    v_node = result_summary['max_v_node']
+    automesh_corresponding_displacements = {
+        "u_val": results[u_node-1]["ux_auto"],
+        "u_node": results[u_node-1]["auto_node_index"],
+        "v_val": results[v_node-1]["vy_auto"],
+        "v_node": results[v_node-1]["auto_node_index"],
+    }
+
+    return automesh_corresponding_displacements
+
+
+def edofs_to_enodes(edofs, dofs):
+    """
+    Convert DOF-based 'edofs' (nEls x 6) to node-based 'enodes' (nEls x 3).
+    Each row in 'edofs' has 3 nodes, each with 2 DOFs => total 6 columns.
+    'dofs' is shape (nNodes, 2), listing the DOF pair [dx, dy] for each node i.
+
+    Parameters
+    ----------
+    edofs : ndarray of shape (nEls, 6)
+        Each row: [dx1, dy1, dx2, dy2, dx3, dy3]
+    dofs : ndarray of shape (nNodes, 2)
+        dofs[i, :] = [dx_i, dy_i] for node (i+1), 1-based node indexing.
+
+    Returns
+    -------
+    enodes : ndarray of shape (nEls, 3)
+        Each row: [nodeA, nodeB, nodeC] (1-based node indices).
+    """
+
+    # 1) Build a lookup dict: (dx, dy) -> node_index (1-based).
+    lookup = {}
+    for i_node in range(dofs.shape[0]):
+        dx_i, dy_i = dofs[i_node]
+        lookup[(dx_i, dy_i)] = i_node + 1  # store 1-based
+
+    n_els = edofs.shape[0]
+    enodes = np.zeros((n_els, 3), dtype=int)
+
+    # 2) For each element row in edofs,
+    #    we have [dx1, dy1, dx2, dy2, dx3, dy3].
+    for i_el in range(n_els):
+        d = edofs[i_el]
+        # d is shape (6,). group them into pairs:
+        # node1 has (d[0], d[1]), node2 => (d[2], d[3]), node3 => (d[4], d[5])
+        node1 = lookup.get((d[0], d[1]))
+        node2 = lookup.get((d[2], d[3]))
+        node3 = lookup.get((d[4], d[5]))
+
+        enodes[i_el] = [node1, node2, node3]
+
+    return enodes

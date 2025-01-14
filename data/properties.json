@@ -117,7 +117,7 @@
             "type": "line",
             "edge": 10,
             "points": [10, 1],
-            "marker": 101,
+            "marker": 110,
             "value": 0.0,
             "dimension": 0
           }
@@ -170,7 +170,7 @@
       "plane2": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.2,
         "points": [
           [0.0, 0.0],
           [1.0, 0.0],
@@ -198,7 +198,7 @@
             "type": "line",
             "edge": 5,
             "points": [5, 6],
-            "marker": 101,
+            "marker": 105,
             "value": 0.0,
             "dimension": 0
           },
@@ -206,7 +206,7 @@
             "type": "line",
             "edge": 10,
             "points": [10, 1],
-            "marker": 102,
+            "marker": 110,
             "value": 0.0,
             "dimension": 0
           }
@@ -259,7 +259,7 @@
       "plane3": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.2,
         "points": [
           [0.0, 0.0],
           [1.0, 0.0],
@@ -287,7 +287,7 @@
             "type": "line",
             "edge": 5,
             "points": [5, 6],
-            "marker": 101,
+            "marker": 105,
             "value": 0.0,
             "dimension": 1
           },
@@ -295,7 +295,7 @@
             "type": "line",
             "edge": 1,
             "points": [1, 2],
-            "marker": 102,
+            "marker": 101,
             "value": 0.0,
             "dimension": 0
           }
@@ -348,7 +348,7 @@
       "plane4": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.2,
         "points": [
           [0.0, 0.0],
           [1.0, 0.0],
@@ -457,7 +457,7 @@
             "type": "line",
             "edge": 6,
             "points": [6, 7],
-            "marker": 101,
+            "marker": 106,
             "value": 0.0,
             "dimension": 1
           },
@@ -465,7 +465,7 @@
             "type": "line",
             "edge": 1,
             "points": [1, 2],
-            "marker": 102,
+            "marker": 101,
             "value": 0.0,
             "dimension": 0
           }
@@ -518,7 +518,7 @@
       "plane6": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.2,
         "points": [
           [0.0, 0.0],
           [2.7, 0.0],
@@ -629,7 +629,7 @@
             "type": "line",
             "edge": 5,
             "points": [5, 6],
-            "marker": 101,
+            "marker": 105,
             "value": 0.0,
             "dimension": 1
           },
@@ -637,7 +637,7 @@
             "type": "line",
             "edge": 1,
             "points": [1, 2],
-            "marker": 102,
+            "marker": 101,
             "value": 0.0,
             "dimension": 0
           }
@@ -690,7 +690,7 @@
       "plane8": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.3,
         "points": [
           [0.0, 0.0],
           [1.5, 0.0],
@@ -720,7 +720,7 @@
             "type": "line",
             "edge": 5,
             "points": [5, 6],
-            "marker": 101,
+            "marker": 105,
             "value": 0.0,
             "dimension": 0
           },
@@ -728,7 +728,7 @@
             "type": "line",
             "edge": 1,
             "points": [1, 2],
-            "marker": 102,
+            "marker": 101,
             "value": 0.0,
             "dimension": 0
           }
@@ -781,7 +781,7 @@
       "plane9": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.3,
         "points": [
           [0.0, 0.0],
           [2.0, 0.0],
@@ -827,7 +827,7 @@
             "type": "line",
             "edge": 7,
             "points": [7, 8],
-            "marker": 103,
+            "marker": 107,
             "value": 0.0,
             "dimension": 1
           }
@@ -880,7 +880,7 @@
       "plane10": {
         "el_type": 2,
         "dofs_per_node": 2,
-        "el_size_factor": 0.1,
+        "el_size_factor": 0.05,
         "points": [
           [0.0, 0.0],
           [0.1, 0.0],
@@ -941,7 +941,7 @@
           "force3": {
              "type": "point",
              "point": 6,
-             "marker": 3,
+             "marker": 6,
              "value": 5.0,
              "dimension": 2
           },
@@ -1282,7 +1282,7 @@
           "type": "line",
           "edge": 8,
           "points": [8, 1],
-          "marker": 101,
+          "marker": 108,
           "value": 0.0,
           "dimension": 0
         }
@@ -1300,7 +1300,7 @@
           "point": 5,
           "marker": 5,
           "value": -100.0,
-          "dimension": 12
+          "dimension": 1
         }
       }
     }

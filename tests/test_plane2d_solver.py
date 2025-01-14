@@ -66,7 +66,7 @@ class TestPlane2DSolver(unittest.TestCase):
                 "type": "line",
                 "edge": 8,
                 "points": [8, 1],  # 1-based node indices
-                "marker": 10,
+                "marker": 108,
                 "value": 0.0,
                 "dimension": 0
             }
@@ -76,14 +76,14 @@ class TestPlane2DSolver(unittest.TestCase):
             "force1": {
                 "type": "point",
                 "point": 4,  # 1-based ID
-                "marker": 1,
+                "marker": 4,
                 "value": 100.0,
                 "dimension": 1
             },
             "force2": {
                 "type": "point",
                 "point": 5,  # 1-based ID
-                "marker": 2,
+                "marker": 5,
                 "value": -100.0,
                 "dimension": 1
             }
@@ -101,7 +101,7 @@ class TestPlane2DSolver(unittest.TestCase):
         # -----------------------------------------
         # 2.2) SOLVE THE PREDEFINED MESH
         # -----------------------------------------
-        a, r, es, ed = solve_plane2d(
+        a, r, es, ed, results_summary = solve_plane2d(
             coords, dofs, edofs, bdofs,
             material_data, boundary_conditions, loads
         )
@@ -127,7 +127,7 @@ class TestPlane2DSolver(unittest.TestCase):
         # -----------------------------------------
         # 3.2) SOLVE THE AUTO-GENERATED MESH
         # -----------------------------------------
-        a_auto, r_auto, es_auto, ed_auto = solve_plane2d(
+        a_auto, r_auto, es_auto, ed_auto, results_summary_auto = solve_plane2d(
             coords_auto, dofs_auto, edofs_auto, bdofs_auto,
             material_data, boundary_conditions, loads
         )

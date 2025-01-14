@@ -318,7 +318,7 @@ def prepare_beam_data_for_latex(beam_version: str, simulation_index, geometry, e
 
 
 def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, simulation_data, coords, dofs, edofs,
-                                   material_data, boundary_conditions, forces, mesh_props):
+                                   material_data, boundary_conditions, forces, mesh_props, result_summary):
     analysis_type = 'Płaskim Stanie Naprężenia (PSN)'
     ptype = material_data['ptype']
     if ptype == 2:
@@ -365,9 +365,22 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
 
     t_mm = material_data['t'] * 1000  # Convert from m to mm
     if t_mm >= 1000:
-        t_disp = f"{t_mm / 1000:.2f}".rstrip('0').rstrip('.')  # Convert back to m and remove trailing zeros
+        t_m = material_data['t']
+        t_disp = f"{t_m:.2f}".rstrip('0').rstrip('.')  # Convert back to m and remove trailing zeros
+        t_unit = "m"
     else:
         t_disp = f"{t_mm:.2f}".rstrip('0').rstrip('.')  # Remove trailing zeros
+        t_unit = "mm"
+
+    abs_sx = abs(result_summary["max_sx_val"])
+    abs_sy = abs(result_summary["max_sy_val"])
+
+    if abs_sx >= abs_sy:
+        max_abs_stress = "\sigma_x"
+    else:
+        max_abs_stress = "\sigma_y"
+
+    h_max = f"{mesh_props['el_size_factor']:.4f}".rstrip('0').rstrip('.')  # Remove trailing zeros
 
 
     return {
@@ -375,13 +388,17 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
             'plane2d_version_num_hidden': plane2d_version_num_hidden,
             'simulation_index': f'{simulation_index:03}',
             'analysis_type': analysis_type,
-            'el_size_factor': mesh_props['el_size_factor'],
+            'el_size_factor': h_max,
             't': t_disp,
+            't_unit': t_unit,
             'E': formatted_E,
             'nu': formatted_nu,
             'forces': forces_list,
             'bc_list': bc_list,
-            'plot_path': plot_path
+            'plot_path': plot_path,
+            'max_u_node': result_summary['max_u_node'],
+            'max_v_node': result_summary['max_v_node'],
+            'max_abs_stress': max_abs_stress
         }
 
 

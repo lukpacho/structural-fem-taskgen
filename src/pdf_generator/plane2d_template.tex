@@ -43,12 +43,12 @@
 
     \noindent Dla przedstawionego układu w \textbf{\VAR{analysis_type}} wyznaczyć:
     \begin{itemize}
-        \item wartości \textbf{przemieszczeń poziomych} $(u_x)$ oraz \textbf{pionowych} $(v_y)$, w miejscach zaznaczonych na rysunku,
-        \item \textbf{maksymalną} \textbf{bezwzględną} wartość naprężeń normalnych $max(|\sigma|)$ ($\sigma_x$ lub $\sigma_y$).
+        \item wartości \textbf{przemieszczeń poziomych} $(u_x)$ w węźle \VAR{max_u_node} oraz \textbf{pionowych} $(v_y)$ w węźle \VAR{max_v_node},
+        \item \textbf{maksymalną} \textbf{bezwzględną} wartość naprężeń normalnych $\mathrm{max}(|\VAR{max_abs_stress}|)$ oraz ich \textbf{lokalizację}.
     \end{itemize}
 
-    \noindent Zadanie należy rozwiązać stosując trójkątny element skończony (CST) dla: \textbf{A)} siatki przedstawionej na rysunku, \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{max} = \VAR{el_size_factor}$\,$\si{m}$. \\
-    Konstrukcja ma grubość $t = \VAR{t}$\,\BLOCK{ if t|int >= 1000 }$\si{m}$  \BLOCK{ else }$\si{mm}$ \BLOCK{ endif } i wykonano ją z materiału o parametrach $E = \VAR{E}$\,$\si{GPa}$ oraz $\nu = \VAR{nu}$. \\
+    \noindent Zadanie należy rozwiązać stosując trójkątny element skończony (CST) dla: \textbf{A)} siatki przedstawionej na rysunku, \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{\mathrm{max}} = \VAR{el_size_factor}$\,$\si{m}$. \\
+    Konstrukcja ma grubość $t = \VAR{t}$\,$\si{\VAR{t_unit}}$ i wykonano ją z materiału o parametrach $E = \VAR{E}$\,$\si{GPa}$ oraz $\nu = \VAR{nu}$. \\
     Zadany układ podparty jest na krawędzi pomiędzy węzłami:
     \BLOCK{ for bc in bc_list}
         \VAR{bc.point1} - \VAR{bc.point2} \VAR{bc.direction}%
@@ -74,12 +74,12 @@
     \begin{enumerate}
     \item Skrypt do rozwiązania części \textbf{A)} \dotfill 10 pkt
     \item Skrypt do rozwiązania części \textbf{B)} \dotfill 10 pkt
-    \item Wyniki przemieszczeń i naprężeń dla obu wariantów w tabeli poniżej (uzupełnij jednostki) \dotfill 5 pkt
+    \item Wyniki przemieszczeń i naprężeń (w wybranych jednostkach) w tabeli poniżej oraz lokalizacje naprężeń oznaczone na rysunku (dla obu wariantów) \dotfill 5 pkt
     \begin{table}[ht]
         \centering
-        \begin{tabular}{@{}m{.02\textwidth} m{.2\textwidth} m{.2\textwidth} m{.2\textwidth}@{}}
+        \begin{tabular}{@{}m{.02\textwidth} m{.15\textwidth} m{.15\textwidth} m{.2\textwidth} @{}}
         \toprule
-         & $u_x$ [\dotfill] & $v_y$ [\dotfill] & $max(\sigma)$ [\dotfill] \\ \midrule
+         & $u_x$ [\dotfill] & $v_y$ [\dotfill] & $\mathrm{max}(|\VAR{max_abs_stress}|)$ [\dotfill] \\ \midrule
          \textbf{A)} & & & \\ \midrule
          \textbf{B)} & & & \\ \bottomrule
         \end{tabular}
