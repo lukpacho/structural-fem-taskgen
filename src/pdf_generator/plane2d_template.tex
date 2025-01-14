@@ -41,42 +41,40 @@
 
     \noindent\textbf{Treść zadania:} \vspace{1mm}
 
-    \noindent Dla przedstawionego układu w \textbf{\VAR{analysis_type}} należy wyznaczyć:
+    \noindent Dla przedstawionego układu w \textbf{\VAR{analysis_type}} wyznaczyć:
     \begin{itemize}
         \item wartości \textbf{przemieszczeń poziomych} $(u_x)$ oraz \textbf{pionowych} $(v_y)$, w miejscach zaznaczonych na rysunku,
         \item \textbf{maksymalną} \textbf{bezwzględną} wartość naprężeń normalnych $max(|\sigma|)$ ($\sigma_x$ lub $\sigma_y$).
     \end{itemize}
 
-    \noindent Zadanie należy rozwiązać, stosując trójkątny element skończony (CST) dla: \textbf{A)} siatki przedstawionej na rysunku, \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{max} = \VAR{el_size_factor} \si{m}$. \\
-    Konstrukcja ma grubość $t = \VAR{t} \si{mm}$ i wykonano ją z materiału o parametrach $E = \VAR{E} \si{GPa}$ oraz $\nu = \VAR{nu}$. \\
-    Zadany układ podparty jest na krawędzi pomiędzy węzłami
+    \noindent Zadanie należy rozwiązać stosując trójkątny element skończony (CST) dla: \textbf{A)} siatki przedstawionej na rysunku, \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{max} = \VAR{el_size_factor}$\,$\si{m}$. \\
+    Konstrukcja ma grubość $t = \VAR{t}$\,\BLOCK{ if t|int >= 1000 }$\si{m}$  \BLOCK{ else }$\si{mm}$ \BLOCK{ endif } i wykonano ją z materiału o parametrach $E = \VAR{E}$\,$\si{GPa}$ oraz $\nu = \VAR{nu}$. \\
+    Zadany układ podparty jest na krawędzi pomiędzy węzłami:
     \BLOCK{ for bc in bc_list}
-        \VAR{bc.point1} oraz \VAR{bc.point2} \VAR{bc.direction}%
+        \VAR{bc.point1} - \VAR{bc.point2} \VAR{bc.direction}%
+        \BLOCK{ if not loop.last }, \BLOCK{ endif }
     \BLOCK{ endfor }. 
-    Działają na niego obciążenia w postaci 
+    Na układ działają obciążenia w postaci 
     \BLOCK{ for force in forces}
         \BLOCK{if loop.first}
             \BLOCK{ if loop.length > 1} sił skupionych: 
             \BLOCK{ else } siły skupionej
             \BLOCK{ endif }
         \BLOCK{ endif }
-        $P_\VAR{loop.index} = \VAR{force.value} \si{\kilo\newton}$ w węźle \VAR{force.point} na kierunku \VAR{force.direction}%
+        $P_\VAR{loop.index} = \VAR{force.value}\si{kN}$ w węźle \VAR{force.point} na kierunku \VAR{force.direction}%
         \BLOCK{ if not loop.last }, \BLOCK{ endif }
     \BLOCK{ endfor }. \newline
 
     \noindent\textbf{Schemat układu} (wymiary w metrach):
-
-    \begin{figure}[ht]
-        \centering
-        \includegraphics[width=\textwidth]{\VAR{plot_path}}
-    \end{figure}
+    
+    \includegraphics[width=\textwidth]{\VAR{plot_path}}\par
 
     \noindent\textbf{Wymagane elementy opracowania:}
 
     \begin{enumerate}
     \item Skrypt do rozwiązania części \textbf{A)} \dotfill 10 pkt
     \item Skrypt do rozwiązania części \textbf{B)} \dotfill 10 pkt
-    \item Wyniki przemieszczeń i naprężeń dla obu wariantów (uzupełnij jednostki w tabeli poniżej) \dotfill 5 pkt
+    \item Wyniki przemieszczeń i naprężeń dla obu wariantów w tabeli poniżej (uzupełnij jednostki) \dotfill 5 pkt
     \begin{table}[ht]
         \centering
         \begin{tabular}{@{}m{.02\textwidth} m{.2\textwidth} m{.2\textwidth} m{.2\textwidth}@{}}

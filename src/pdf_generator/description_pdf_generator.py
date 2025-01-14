@@ -338,9 +338,10 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
             direction = 'pionowym'
         elif force['dimension'] != 1:
             direction = 'Błąd. Zły kierunek działania siły.'
+        force_disp = f"{force['value']:.2f}".rstrip('0').rstrip('.') + "\,"  # Remove trailing zeros and add thin space
         forces_list.append({
             'point': force['point'],
-            'value': force['value'],
+            'value': force_disp,
             'direction': direction
         })
 
@@ -348,9 +349,9 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
     for _, bc in boundary_conditions.items():
         direction = 'w obu kierunkach'
         if bc['dimension'] == 1:
-            direction = 'na kierunku poziomym'
+            direction = 'w kierunku poziomym'
         elif bc['dimension'] == 2:
-            direction = 'na kierunku pionowym'
+            direction = 'w kierunku pionowym'
         elif bc['dimension'] != 0:
             direction = 'Błąd. Zły kierunek podparcia.'
         bc_list.append({
@@ -359,19 +360,29 @@ def prepare_plane2d_data_for_latex(plane2d_version: str, simulation_index: int, 
             'direction': direction
         })
 
+    formatted_E = f"{material_data['E'] / 1_000_000:.2f}".rstrip('0').rstrip('.')  # Remove trailing zeros
+    formatted_nu = f"{material_data['nu']:.2f}".rstrip('0').rstrip('.')  # Remove trailing zeros
+
+    t_mm = material_data['t'] * 1000  # Convert from m to mm
+    if t_mm >= 1000:
+        t_disp = f"{t_mm / 1000:.2f}".rstrip('0').rstrip('.')  # Convert back to m and remove trailing zeros
+    else:
+        t_disp = f"{t_mm:.2f}".rstrip('0').rstrip('.')  # Remove trailing zeros
+
+
     return {
-        'plane2d_version_num': plane2d_version_num,
-        'plane2d_version_num_hidden': plane2d_version_num_hidden,
-        'simulation_index': f'{simulation_index:03}',
-        'analysis_type': analysis_type,
-        'el_size_factor': mesh_props['el_size_factor'],
-        't': material_data['t']*1000,  #convert m to mm
-        'E': material_data['E']/1_000_000,  #convert kPa to GPa
-        'nu': material_data['nu'],
-        'forces': forces_list,
-        'bc_list': bc_list,
-        'plot_path': plot_path
-    }
+            'plane2d_version_num': plane2d_version_num,
+            'plane2d_version_num_hidden': plane2d_version_num_hidden,
+            'simulation_index': f'{simulation_index:03}',
+            'analysis_type': analysis_type,
+            'el_size_factor': mesh_props['el_size_factor'],
+            't': t_disp,
+            'E': formatted_E,
+            'nu': formatted_nu,
+            'forces': forces_list,
+            'bc_list': bc_list,
+            'plot_path': plot_path
+        }
 
 
 if __name__ == '__main__':

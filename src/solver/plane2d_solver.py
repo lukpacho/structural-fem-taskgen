@@ -186,16 +186,33 @@ def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces
     return coords, dofs, edofs, bdofs
 
 
-def load_plane2d_version_properties(properties: dict, plane_version: str):
-    plane_data = properties[plane_version]
-    points = plane_data['points']
-    elements = plane_data['elements']
-    material_data = plane_data['material_data']
-    boundary_conditions = plane_data['boundary_conditions']
-    loads = plane_data['forces']
-    mesh_props = {
-        "el_type": plane_data["el_type"],
-        "dofs_per_node": plane_data["dofs_per_node"],
-        "el_size_factor": plane_data["el_size_factor"]
-    }
-    return points, elements, material_data, boundary_conditions, loads, mesh_props
+def load_plane2d_configuration(properties: dict, plane_version: str, mode: str):
+    if mode == "predefined":
+        plane_data = properties[plane_version]
+        points = plane_data['points']
+        elements = plane_data['elements']
+        material_data = plane_data['material_data']
+        boundary_conditions = plane_data['boundary_conditions']
+        forces = plane_data['forces']
+        mesh_props = {
+            "el_type": plane_data["el_type"],
+            "dofs_per_node": plane_data["dofs_per_node"],
+            "el_size_factor": plane_data["el_size_factor"]
+        }
+        return points, elements, material_data, boundary_conditions, forces, mesh_props
+
+    elif mode == "random":
+        plane_data = properties['plane_configurations'][plane_version]
+        points = plane_data['points']
+        elements = plane_data['elements']
+        boundary_conditions = plane_data['boundary_conditions']  # e.g., contains "possible_edges" and "corresponding_points"
+        forces = plane_data['forces']  # e.g., "possible_points", "force_range", "possible_dimensions"
+        material_options = properties['materials']  # Use global materials
+        mesh_props = {
+            "el_type": plane_data["el_type"],
+            "dofs_per_node": plane_data["dofs_per_node"],
+            "el_size_factor": plane_data["el_size_factor"]
+        }
+        return points, elements, material_options, boundary_conditions, forces, mesh_props
+    else:
+        raise ValueError("Unknown mode")

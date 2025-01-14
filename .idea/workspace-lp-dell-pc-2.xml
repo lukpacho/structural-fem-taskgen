@@ -4,18 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="The task description is properly generated for the predefined mode of the script. Now, I'm woring on the random generation of the input for the plane2d solver. I need to finish this and then save the input for future results calculation. Then I'll go for the results saving.">
+    <list default="true" id="cc55cd97-ae29-4876-a145-a502e0d4e191" name="Changes" comment="I need to adjust the convention of the moment printing to properly generate pdfs in random mode. Other things work quite well.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/properties.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/properties.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/beam_types.odt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/beam_types.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/stanli.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generators/plane2d_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/generators/plane2d_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pdf_generator/plane2d_template.tex" beforeDir="false" afterPath="$PROJECT_DIR$/src/pdf_generator/plane2d_template.tex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/solver/plane2d_plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solver/plane2d_plotter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/solver/plane2d_solver.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solver/plane2d_solver.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,9 +22,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
-  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -47,27 +34,21 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Python tests.Python tests in test_generator.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests in test_plane2d_solver.py.executor&quot;: &quot;Run&quot;,
     &quot;Python tests.Python tests in test_solver.py.executor&quot;: &quot;Run&quot;,
     &quot;Python.generator.executor&quot;: &quot;Run&quot;,
     &quot;Python.main --mode predefined.executor&quot;: &quot;Run&quot;,
     &quot;Python.main --mode random.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main plane2d predefined.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main plane2d random.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Debug&quot;,
     &quot;Python.pdf_generator.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/media/lukpacho/Disk-1/OneDrivePG/PycharmProjects/problemGeneratorMO_v2/main.py&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pacho/OneDrive - Politechnika Gdańska/PycharmProjects/problemGeneratorMO_v2/data/latex_templates&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.inline.completion&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -76,13 +57,11 @@
       <recent name="C:\Users\pacho\OneDrive - Politechnika Gdańska\PycharmProjects\problemGeneratorMO_v2\data\latex_templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/generators" />
-      <recent name="$PROJECT_DIR$/src/pdf_generator" />
       <recent name="$PROJECT_DIR$/data/latex_templates" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main plane2d random">
-    <configuration name="description_pdf_generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.main --mode predefined">
+    <configuration name="generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="problemGeneratorMO_v2" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -91,12 +70,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/pdf_generator" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/pdf_generator/description_pdf_generator.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/generator.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -121,7 +100,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--mode predefined --beam_version 998 --generate_pdf yes" />
+      <option name="PARAMETERS" value="--mode predefined --beam_version 998" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -145,55 +124,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--mode random --beam_version 2 3 4 5 6 7 8 --num_simulations 3" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main plane2d predefined" type="PythonConfigurationType" factoryName="Python">
-      <module name="problemGeneratorMO_v2" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="problemGeneratorMO" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--problem_type plane2d --mode predefined" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main plane2d random" type="PythonConfigurationType" factoryName="Python">
-      <module name="problemGeneratorMO_v2" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="problemGeneratorMO" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="--problem_type plane2d --mode random --plane2d_version 1" />
+      <option name="PARAMETERS" value="--mode random --beam_version 2 --num_simulations 2" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -224,7 +155,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests in test_beam_generator.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="pdf_generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="problemGeneratorMO_v2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/pdf_generator" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/pdf_generator/pdf_generator.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_generator.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="problemGeneratorMO_v2" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -236,11 +190,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_beam_generator.py&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_generator.py&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests in test_beam_solver.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests in test_solver.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="problemGeneratorMO_v2" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -252,52 +206,34 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_beam_solver.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Python tests in test_plane2d_solver.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="problemGeneratorMO_v2" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_plane2d_solver.py&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_solver.py&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main plane2d predefined" />
-      <item itemvalue="Python.main plane2d random" />
       <item itemvalue="Python.main --mode predefined" />
       <item itemvalue="Python.main --mode random" />
-      <item itemvalue="Python.description_pdf_generator" />
+      <item itemvalue="Python.pdf_generator" />
+      <item itemvalue="Python.generator" />
       <item itemvalue="Python.main" />
-      <item itemvalue="Python tests.Python tests in test_plane2d_solver.py" />
-      <item itemvalue="Python tests.Python tests in test_beam_solver.py" />
-      <item itemvalue="Python tests.Python tests in test_beam_generator.py" />
+      <item itemvalue="Python tests.Python tests in test_generator.py" />
+      <item itemvalue="Python tests.Python tests in test_solver.py" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests in test_plane2d_solver.py" />
-        <item itemvalue="Python.description_pdf_generator" />
-        <item itemvalue="Python tests.Python tests in test_beam_solver.py" />
-        <item itemvalue="Python tests.Python tests in test_beam_generator.py" />
+        <item itemvalue="Python.pdf_generator" />
+        <item itemvalue="Python tests.Python tests in test_solver.py" />
+        <item itemvalue="Python tests.Python tests in test_generator.py" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.generator" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PY-243.22562.220" />
-        <option value="bundled-python-sdk-0fc6c617c4bd-9a18a617cbe4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.22562.220" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
       </set>
     </attachedChunks>
   </component>
@@ -333,27 +269,7 @@
       <workItem from="1724663807126" duration="755000" />
       <workItem from="1724672207039" duration="1541000" />
       <workItem from="1729581241136" duration="5681000" />
-      <workItem from="1730189556639" duration="27033000" />
-      <workItem from="1730388325468" duration="2344000" />
-      <workItem from="1730798835535" duration="22588000" />
-      <workItem from="1731066947540" duration="965000" />
-      <workItem from="1731401357655" duration="4974000" />
-      <workItem from="1731503408363" duration="2977000" />
-      <workItem from="1731674058336" duration="1032000" />
-      <workItem from="1734442208499" duration="3385000" />
-      <workItem from="1734445961826" duration="3857000" />
-      <workItem from="1734528616070" duration="2703000" />
-      <workItem from="1734621294254" duration="68000" />
-      <workItem from="1734694797771" duration="9614000" />
-      <workItem from="1734949607197" duration="15111000" />
-      <workItem from="1736243008324" duration="18910000" />
-      <workItem from="1736326336429" duration="4189000" />
-      <workItem from="1736421369296" duration="9715000" />
-      <workItem from="1736495253159" duration="17057000" />
-      <workItem from="1736600909176" duration="8378000" />
-      <workItem from="1736680409938" duration="2306000" />
-      <workItem from="1736755101922" duration="10669000" />
-      <workItem from="1736838513430" duration="22861000" />
+      <workItem from="1730189556639" duration="29269000" />
     </task>
     <task id="LOCAL-00001" summary="Working generator and solver for beams. Not working plotting. Switching to frames.">
       <option name="closed" value="true" />
@@ -427,55 +343,7 @@
       <option name="project" value="LOCAL" />
       <updated>1730218674666</updated>
     </task>
-    <task id="LOCAL-00010" summary="Printing and generating works well. Now, the script would have to be adjusted to be easier to use.">
-      <option name="closed" value="true" />
-      <created>1730823908682</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1730823908682</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Adding the functionality of solving plane2d stress/strain problems.">
-      <option name="closed" value="true" />
-      <created>1734967630446</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1734967630446</updated>
-    </task>
-    <task id="LOCAL-00012" summary="The solving works for both, the predefined and auto meshing. Now I need to add plotting functionality and then solving and plotting for the randomly generated inputs.">
-      <option name="closed" value="true" />
-      <created>1736267063846</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1736267063846</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Currently I'm working on implementing plane2d solving and task description pdf plotting in main.py. I stopped at build_plane2d_with_auto_mesh function.">
-      <option name="closed" value="true" />
-      <created>1736437810982</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1736437810982</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Still working on the plane2d_template.tex to generate task description">
-      <option name="closed" value="true" />
-      <created>1736521852292</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1736521852292</updated>
-    </task>
-    <task id="LOCAL-00015" summary="The task description is properly generated for the predefined mode of the script. Now, I'm woring on the random generation of the input for the plane2d solver. I need to finish this and then save the input for future results calculation. Then I'll go for the results saving.">
-      <option name="closed" value="true" />
-      <created>1736609285137</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1736609285137</updated>
-    </task>
-    <option name="localTasksCounter" value="16" />
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -501,38 +369,30 @@
     <MESSAGE value="Most parts are ready in pdf creation, however there is an issue on loads presention where they are sometimes overlapping etc." />
     <MESSAGE value="I think the pdf creation is working quite well. I think I should test it on the random parameters generation now." />
     <MESSAGE value="I need to adjust the convention of the moment printing to properly generate pdfs in random mode. Other things work quite well." />
-    <MESSAGE value="Printing and generating works well. Now, the script would have to be adjusted to be easier to use." />
-    <MESSAGE value="Adding the functionality of solving plane2d stress/strain problems." />
-    <MESSAGE value="The solving works for both, the predefined and auto meshing. Now I need to add plotting functionality and then solving and plotting for the randomly generated inputs." />
-    <MESSAGE value="Currently I'm working on implementing plane2d solving and task description pdf plotting in main.py. I stopped at build_plane2d_with_auto_mesh function." />
-    <MESSAGE value="Still working on the plane2d_template.tex to generate task description" />
-    <MESSAGE value="The task description is properly generated for the predefined mode of the script. Now, I'm woring on the random generation of the input for the plane2d solver. I need to finish this and then save the input for future results calculation. Then I'll go for the results saving." />
-    <option name="LAST_COMMIT_MESSAGE" value="The task description is properly generated for the predefined mode of the script. Now, I'm woring on the random generation of the input for the plane2d solver. I need to finish this and then save the input for future results calculation. Then I'll go for the results saving." />
+    <option name="LAST_COMMIT_MESSAGE" value="I need to adjust the convention of the moment printing to properly generate pdfs in random mode. Other things work quite well." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/generators/beam_generator.py</url>
-          <line>198</line>
-          <option name="timeStamp" value="25" />
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/generators/beam_generator.py</url>
-          <line>220</line>
-          <option name="timeStamp" value="26" />
+          <url>file://$PROJECT_DIR$/src/pdf_generator/pdf_generator.py</url>
+          <line>189</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main_plane2d_random.coverage" NAME="main plane2d random Coverage Results" MODIFIED="1736860578847" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main.coverage" NAME="main Coverage Results" MODIFIED="1729665997335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1734702330156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main_plane2d_predefined.coverage" NAME="main plane2d predefined Coverage Results" MODIFIED="1736783876454" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$.coverage" NAME=" Coverage Results" MODIFIED="1736499297500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1734702310475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$.coverage" NAME=" Coverage Results" MODIFIED="1718193392817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$pdf_generator.coverage" NAME="pdf_generator Coverage Results" MODIFIED="1730218403961" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/pdf_generator" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_random.coverage" NAME="main --mode random Coverage Results" MODIFIED="1730215681924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$generator.coverage" NAME="generator Coverage Results" MODIFIED="1717762861756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$pdf_generator.coverage" NAME="pdf_generator Coverage Results" MODIFIED="1730811546938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/pdf_generator" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main.coverage" NAME="main Coverage Results" MODIFIED="1729665997335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/problemGeneratorMO_v2$main___mode_predefined.coverage" NAME="main --mode predefined Coverage Results" MODIFIED="1730218619423" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

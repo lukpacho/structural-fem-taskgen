@@ -12,8 +12,9 @@ from src.pdf_generator.description_pdf_generator import prepare_beam_data_for_la
 
 # Plane2D imports
 from src.solver.plane2d_solver import (solve_plane2d, build_plane2d_with_predefined_mesh, build_plane2d_with_auto_mesh,
-                                       load_plane2d_version_properties)
+                                       load_plane2d_configuration)
 from src.pdf_generator.description_pdf_generator import prepare_plane2d_data_for_latex
+from src.generators.plane2d_generator import generate_plane2d_input_random
 
 
 def run_beam_simulation(properties: dict, beam_version: str,
@@ -80,14 +81,34 @@ def run_plane2d_simulation(properties: dict, plane2d_version: str,
         generate_pdf (bool): Whether to generate PDF documents.
     """
     if mode == 'random':
+        for simulation_index in range(num_simulations):
+            simulation_data = [mode, plane2d_version, simulation_index]
+            points, elements, material_data, boundary_conditions, forces, mesh_props = \
+                generate_plane2d_input_random(properties, plane2d_version)
 
-        pass
+            coords, dofs, edofs, bdofs = build_plane2d_with_predefined_mesh(
+                points, elements, boundary_conditions, forces
+            )
+
+            a, r, es, ed = solve_plane2d(
+                coords, dofs, edofs, bdofs,
+                material_data, boundary_conditions, forces
+            )
+
+            if generate_pdf:
+                data = prepare_plane2d_data_for_latex(
+                    plane2d_version, simulation_index, simulation_data, coords, dofs, edofs, material_data,
+                    boundary_conditions, forces, mesh_props
+                )
+                output_filename = '_'.join([mode, plane2d_version, str(simulation_index), 'description'])
+                generate_description_pdf("plane2d_template.tex", output_filename, data)
+
     elif mode == 'predefined':
         simulation_index = 0
         simulation_data = [mode, plane2d_version, simulation_index]
 
         points, elements, material_data, boundary_conditions, forces, mesh_props = (
-            load_plane2d_version_properties(properties, plane2d_version))
+            load_plane2d_configuration(properties, plane2d_version, mode))
 
         coords, dofs, edofs, bdofs = build_plane2d_with_predefined_mesh(
             points, elements, boundary_conditions, forces
@@ -115,7 +136,7 @@ def main():
                         help='Simulation mode: random or predefined')
     parser.add_argument('--beam_version', type=list, nargs='+', default=[999],
                         help='Beam version(s) to simulate. Used if problem_type=beam.')
-    parser.add_argument('--plane2d_version', type=list, default=[999],
+    parser.add_argument('--plane2d_version', type=int, nargs='+', default=[999],
                         help='Plane version(s) to simulate. Used if problem_type=plane2d.')
     parser.add_argument('--num_simulations', type=int, default=1,
                         help='Number of simulations to perform (random mode only).')
@@ -154,7 +175,7 @@ def main():
     elif args.problem_type == 'plane2d':
         if args.mode == 'random':
             for version in args.plane2d_version:
-                plane2d_version = f'plane{int(version[0])}'
+                plane2d_version = f'plane{int(version)}'
                 run_plane2d_simulation(
                     properties=properties,
                     plane2d_version=plane2d_version,
