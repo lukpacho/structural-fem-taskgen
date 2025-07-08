@@ -1,13 +1,15 @@
-import os
 import json
-import numpy as np
+import os
 import random
 from pprint import pprint
+
+import numpy as np
+
 from config import BASE_DIR
 
 
 def load_properties(path):
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         return json.load(file)
 
 
@@ -23,16 +25,16 @@ def save_beam_input(geometry, element_properties, loads, mode, beam_version, sim
     - beam_version: Version identifier for the beam.
     - simulation_index: Optional index for distinguishing between multiple generated simulations.
     """
-    input_filename = f'{mode}_{beam_version}_{simulation_index}_input.json'
-    path = os.path.join(BASE_DIR, 'data', 'results', input_filename)
+    input_filename = f"{mode}_{beam_version}_{simulation_index}_input.json"
+    path = os.path.join(BASE_DIR, "data", "results", input_filename)
 
     data = {
         "geometry": convert_to_json_serializable(geometry),
         "element_properties": convert_to_json_serializable(element_properties),
-        "loads": convert_to_json_serializable(loads)
+        "loads": convert_to_json_serializable(loads),
     }
 
-    with open(path, 'w') as file:
+    with open(path, "w") as file:
         json.dump(data, file, indent=2)
 
 
@@ -49,9 +51,22 @@ def convert_to_json_serializable(data):
     """
     if isinstance(data, np.ndarray):
         return data.tolist()
-    elif isinstance(data, (np.int_, np.intc, np.intp, np.int8,
-                           np.int16, np.int32, np.int64, np.uint8,
-                           np.uint16, np.uint32, np.uint64)):
+    elif isinstance(
+        data,
+        (
+            np.int_,
+            np.intc,
+            np.intp,
+            np.int8,
+            np.int16,
+            np.int32,
+            np.int64,
+            np.uint8,
+            np.uint16,
+            np.uint32,
+            np.uint64,
+        ),
+    ):
         return int(data)
     elif isinstance(data, (np.float_, np.float16, np.float32, np.float64)):
         return float(data)
@@ -100,7 +115,7 @@ def generate_geometry(version, properties):
     edof_counter = 0
 
     for i in range(n_elements):
-        if i+1 in hinges:
+        if i + 1 in hinges:
             edof_list.append(dof_list[edof_counter] + dof_list[edof_counter + 1])
             edof_counter += 2
         else:
@@ -112,14 +127,14 @@ def generate_geometry(version, properties):
     bc = np.array(config["boundary_conditions"])
 
     geometry = {
-        'coord': coord,
-        'dof': dof,
-        'edof': edof,
-        'bc': bc,
-        'ndofs': np.max(dof),
-        'nels': n_elements,
-        'L': lengths,
-        'hinges': hinges
+        "coord": coord,
+        "dof": dof,
+        "edof": edof,
+        "bc": bc,
+        "ndofs": np.max(dof),
+        "nels": n_elements,
+        "L": lengths,
+        "hinges": hinges,
     }
     return geometry, max(lengths)
 
@@ -128,9 +143,9 @@ def generate_element_properties(geometry, properties):
     """
     Generates random materials and sections for each element based on version-specific configurations.
     """
-    n_elements = geometry['nels']
-    materials = properties['materials']
-    sections = properties['sections']
+    n_elements = geometry["nels"]
+    materials = properties["materials"]
+    sections = properties["sections"]
 
     element_properties = []
     for _ in range(n_elements):
@@ -140,17 +155,19 @@ def generate_element_properties(geometry, properties):
         selected_material = materials[selected_material_key]
         selected_section = sections[selected_section_key]
 
-        element_properties.append({
-            'material': {
-                'type': selected_material_key,
-                'E': selected_material['E']
-            },
-            'section': {
-                'type': selected_section_key,
-                'A': selected_section['A'],
-                'I': selected_section['I']
+        element_properties.append(
+            {
+                "material": {
+                    "type": selected_material_key,
+                    "E": selected_material["E"],
+                },
+                "section": {
+                    "type": selected_section_key,
+                    "A": selected_section["A"],
+                    "I": selected_section["I"],
+                },
             }
-        })
+        )
     return element_properties
 
 
@@ -170,14 +187,14 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
     """
     import copy
 
-    dof = geometry['dof']
-    bc = geometry['bc']
-    n_elements = geometry['nels']
-    loads = properties['loads']
+    dof = geometry["dof"]
+    bc = geometry["bc"]
+    n_elements = geometry["nels"]
+    loads = properties["forces"]
 
     # Filter DOF locations that are not restricted by boundary conditions
-    valid_p_dofs = [dof[i, 1]-1 for i in range(len(dof)) if dof[i, 1] not in bc]
-    valid_m_dofs = [dof[i, 2]-1 for i in range(len(dof)) if dof[i, 2] not in bc]
+    valid_p_dofs = [dof[i, 1] - 1 for i in range(len(dof)) if dof[i, 1] not in bc]
+    valid_m_dofs = [dof[i, 2] - 1 for i in range(len(dof)) if dof[i, 2] not in bc]
     valid_q_locs = list(range(n_elements))
 
     # Remove duplicates from the lists (if any)
@@ -196,8 +213,8 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
 
     # Build hinge DOF pairs
     hinge_dof_pairs = {}
-    if 'hinges' in geometry:
-        for hinge_node in geometry['hinges']:
+    if "hinges" in geometry:
+        for hinge_node in geometry["hinges"]:
             left_node = hinge_node
             right_node = hinge_node + 1  # Assuming the hinge connects node i and node i+1
             if right_node >= len(dof):
@@ -214,7 +231,7 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
             break
         dof_num = random.choice(available_p_dofs)
         P_locs.append(dof_num)
-        P_values.append(random.choice(loads['P']))
+        P_values.append(random.choice(loads["P"]))
         available_p_dofs.remove(dof_num)
 
     # Generate M loads
@@ -224,7 +241,7 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
             break
         dof_num = random.choice(available_m_dofs)
         M_locs.append(dof_num)
-        M_values.append(random.choice(loads['M']))
+        M_values.append(random.choice(loads["M"]))
         available_m_dofs.remove(dof_num)
         # If dof_num is in hinge_dof_pairs, remove the counterpart DOF
         if dof_num in hinge_dof_pairs:
@@ -239,23 +256,23 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
             break
         loc = random.choice(available_q_locs)
         q_locs.append(loc)
-        q_values.append(random.choice(loads['q']))
+        q_values.append(random.choice(loads["q"]))
         available_q_locs.remove(loc)
 
     return {
-        'P': P_values,
-        'P_loc': P_locs,
-        'M': M_values,
-        'M_loc': M_locs,
-        'q': q_values,
-        'q_loc': q_locs
+        "P": P_values,
+        "P_loc": P_locs,
+        "M": M_values,
+        "M_loc": M_locs,
+        "q": q_values,
+        "q_loc": q_locs,
     }
 
 
-if __name__ == '__main__':
-    version = 'beam3'
-    properties_path = os.path.join(BASE_DIR, 'data', 'properties.json')
-    properties = load_properties(properties_path)['random']
+if __name__ == "__main__":
+    version = "beam3"
+    properties_path = os.path.join(BASE_DIR, "data", "properties.json")
+    properties = load_properties(properties_path)["random"]
     geometry, max_length = generate_geometry(version, properties)
     pprint(["Selected Geometry:", geometry])
     element_properties = generate_element_properties(geometry, properties)

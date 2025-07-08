@@ -1,0 +1,40 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) checkout the code (pulls repo into the runner)
+      - uses: actions/checkout@v4
+
+      # 2) install Python 3.11
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # 3) Install system libraries gmsh needs
+      - run: sudo apt-get update -y && sudo apt-get install -y libglu1-mesa
+
+      # 4) install project deps + test runner
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest ruff black mypy
+
+      # 5) Ruff linter (fail on warnings)
+      - name: Ruff lint
+        run: ruff check --config pyproject.toml .
+
+      # 6) Black formatting (fail if auto-format would change files)
+      - name: Black check
+        run: black --check --config pyproject.toml .
+
+      # 7) Static type checking
+      - name: Mypy type-check
+        run: mypy --config-file pyproject.toml src/ tests/
+
+      # 8) run unit tests (located in ./tests)
+      - run: pytest -q

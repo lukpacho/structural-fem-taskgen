@@ -1,30 +1,33 @@
 ### plane2d_plotter.py
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.transforms as mtransforms
-from matplotlib.patches import Circle, Rectangle
-from matplotlib.path import Path
 
 # CalFEM for Python
 import calfem.core as cfc
 import calfem.vis_mpl as cfv
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import matplotlib.transforms as mtransforms
+import numpy as np
+from matplotlib.patches import Circle, Rectangle
+from matplotlib.path import Path
 
 from config import BASE_DIR, cm_to_in
 
 # Set global font properties: Times New Roman, size 10.
-mpl.rcParams['font.family'] = 'Times New Roman'
-mpl.rcParams['font.size'] = 10
+mpl.rcParams["font.family"] = "Times New Roman"
+mpl.rcParams["font.size"] = 10
 
-def plot_plane2d_stresses(coords,
-                          edofs,
-                          dofs_per_node,
-                          el_type,
-                          es,
-                          component='sx',
-                          sim_data=None,
-                          mesh_name='predef'):
+
+def plot_plane2d_stresses(
+    coords,
+    edofs,
+    dofs_per_node,
+    el_type,
+    es,
+    component="sx",
+    sim_data=None,
+    mesh_name="predef",
+):
     """
     Plot and save stress contour for either 'sx' or 'sy'.
 
@@ -53,7 +56,7 @@ def plot_plane2d_stresses(coords,
         Path to the saved PDF figure.
     """
     # 1) pick the index for the requested component
-    idx = 0 if component == 'sx' else 1
+    idx = 0 if component == "sx" else 1
     stress_component = es[:, idx]
 
     # 2) Convert to e.g. MPa
@@ -72,7 +75,7 @@ def plot_plane2d_stresses(coords,
         displacements=None,
         draw_elements=False,
         draw_undisplaced_mesh=False,
-        title=f"{component} [MPa] - {mesh_name}"
+        title=f"{component} [MPa] - {mesh_name}",
     )
     cfv.colorbar(shrink=0.35)
 
@@ -85,20 +88,22 @@ def plot_plane2d_stresses(coords,
         fname = f"{mesh_name}_{component}.pdf"
 
     plot_path = os.path.join(BASE_DIR, "data", "results", fname)
-    plt.savefig(plot_path, bbox_inches='tight')
+    plt.savefig(plot_path, bbox_inches="tight")
     plt.close()
     return plot_path
 
 
-def plot_plane2d_displacement(coords,
-                              dofs,
-                              element_nodes,
-                              a,
-                              dofs_per_node,
-                              el_type,
-                              component='ux',
-                              sim_data=None,
-                              mesh_name='predef'):
+def plot_plane2d_displacement(
+    coords,
+    dofs,
+    element_nodes,
+    a,
+    dofs_per_node,
+    el_type,
+    component="ux",
+    sim_data=None,
+    mesh_name="predef",
+):
     """
     Plot and save nodal displacement contour (ux or vy) in millimeters.
 
@@ -130,7 +135,7 @@ def plot_plane2d_displacement(coords,
         File path to the saved PDF figure.
     """
     # 1) Figure out which dof-index we want
-    idx = 0 if component == 'ux' else 1  # 0 => x-DOF, 1 => y-DOF
+    idx = 0 if component == "ux" else 1  # 0 => x-DOF, 1 => y-DOF
 
     # 2) Convert from meters to millimeters
     #    a is shape (n_dofs,1).  For node i => dofs[i,idx]-1 => index in a.
@@ -148,12 +153,12 @@ def plot_plane2d_displacement(coords,
 
     # 4) Draw the nodal displacement contour
     cfv.draw_nodal_values(
-        disp_mm,          # per-node field
-        coords,           # node coords
+        disp_mm,  # per-node field
+        coords,  # node coords
         element_nodes,
-        dofs_per_node=dofs_per_node,    # e.g. 2
+        dofs_per_node=dofs_per_node,  # e.g. 2
         el_type=el_type,
-        title=f"{component} [mm] - {mesh_name}"
+        title=f"{component} [mm] - {mesh_name}",
     )
     cfv.colorbar(shrink=0.35)
 
@@ -166,11 +171,12 @@ def plot_plane2d_displacement(coords,
         fname = f"{mesh_name}_{component}.pdf"
 
     plot_path = os.path.join(BASE_DIR, "data", "results", fname)
-    plt.savefig(plot_path, bbox_inches='tight')
+    plt.savefig(plot_path, bbox_inches="tight")
     plt.close()
     return plot_path
 
-def draw_node_numbers(ax, coords, shape_path, font_size=10, color='black'):
+
+def draw_node_numbers(ax, coords, shape_path, font_size=10, color="black"):
     circle_radius_pts = 6.5
     base_offset_x_pts = 11.0
     base_offset_y_pts = 11.0
@@ -182,23 +188,20 @@ def draw_node_numbers(ax, coords, shape_path, font_size=10, color='black'):
         (+base_offset_x_pts, +base_offset_y_pts),  # bottom-right
     ]
 
-    fontdict = {'family': 'Times New Roman', 'size': font_size, 'color': color}
+    fontdict = {"family": "Times New Roman", "size": font_size, "color": color}
 
     text_objects = []
-    legend_texts = ['Współrzędne:']
+    legend_texts = ["Współrzędne:"]
 
     for i, (x, y) in enumerate(coords):
         node_id = i + 1
         chosen_offset = None
-        for (dx, dy) in offsets_candidates:
+        for dx, dy in offsets_candidates:
             # Transform: place circle center at data coords (x,y) plus a display offset (dx,dy)
-            test_transform = (
-                mtransforms.ScaledTranslation(x, y, ax.transData)
-                + mtransforms.ScaledTranslation(
-                    dx / ax.figure.dpi,
-                    dy / ax.figure.dpi,
-                    ax.figure.dpi_scale_trans
-                )
+            test_transform = mtransforms.ScaledTranslation(
+                x, y, ax.transData
+            ) + mtransforms.ScaledTranslation(
+                dx / ax.figure.dpi, dy / ax.figure.dpi, ax.figure.dpi_scale_trans
             )
             disp_center = test_transform.transform((0, 0))  # => display coords
             data_center = ax.transData.inverted().transform(disp_center)
@@ -209,37 +212,39 @@ def draw_node_numbers(ax, coords, shape_path, font_size=10, color='black'):
 
         if chosen_offset is None:
             chosen_offset = offsets_candidates[0]
-            print(f"Warning: Node {node_id} cannot find offset outside polygon. Using top-left anyway.")
+            print(
+                f"Warning: Node {node_id} cannot find offset outside polygon. Using top-left anyway."
+            )
 
         dx, dy = chosen_offset
-        transform = (
-                mtransforms.ScaledTranslation(x, y, ax.transData)
-                + mtransforms.ScaledTranslation(
-            dx / ax.figure.dpi,
-            dy / ax.figure.dpi,
-            ax.figure.dpi_scale_trans
-            )
+        transform = mtransforms.ScaledTranslation(
+            x, y, ax.transData
+        ) + mtransforms.ScaledTranslation(
+            dx / ax.figure.dpi, dy / ax.figure.dpi, ax.figure.dpi_scale_trans
         )
 
         circle_patch = Circle(
             (0, 0),
             radius=circle_radius_pts,
-            facecolor='white',
-            edgecolor='black',
+            facecolor="white",
+            edgecolor="black",
             linewidth=0.5,
             alpha=0.9,
             transform=transform,
-            zorder=4
+            zorder=4,
         )
         circle_patch.set_clip_on(False)
         ax.add_patch(circle_patch)
 
         text_obj = ax.text(
-            0, 0, str(node_id),
-            ha='center', va='center',
+            0,
+            0,
+            str(node_id),
+            ha="center",
+            va="center",
             fontdict=fontdict,
             transform=transform,
-            zorder=5
+            zorder=5,
         )
         text_objects.append(text_obj)
 
@@ -251,7 +256,7 @@ def draw_node_numbers(ax, coords, shape_path, font_size=10, color='black'):
     return legend_texts, text_objects
 
 
-def draw_element_numbers(ax, ex, ey, font_size=10, color='black'):
+def draw_element_numbers(ax, ex, ey, font_size=10, color="black"):
     """
     Draw each element number at the element centroid, with a small rectangle
     in display coordinates so it won't scale with data.
@@ -259,7 +264,7 @@ def draw_element_numbers(ax, ex, ey, font_size=10, color='black'):
     rect_width_pts = 11.5
     rect_height_pts = 11.0
 
-    fontdict = {'family': 'Times New Roman', 'size': font_size, 'color': color}
+    fontdict = {"family": "Times New Roman", "size": font_size, "color": color}
 
     text_objects = []
     for i in range(ex.shape[0]):
@@ -270,21 +275,28 @@ def draw_element_numbers(ax, ex, ey, font_size=10, color='black'):
         transform = mtransforms.ScaledTranslation(cx, cy, ax.transData)
 
         rect_patch = Rectangle(
-            xy=(-rect_width_pts/2, -rect_height_pts/2),
-            width=rect_width_pts, height=rect_height_pts,
-            facecolor='white', edgecolor='black', linewidth=0.5,
-            alpha=0.9, zorder=4,
-            transform=transform
+            xy=(-rect_width_pts / 2, -rect_height_pts / 2),
+            width=rect_width_pts,
+            height=rect_height_pts,
+            facecolor="white",
+            edgecolor="black",
+            linewidth=0.5,
+            alpha=0.9,
+            zorder=4,
+            transform=transform,
         )
         rect_patch.set_clip_on(False)
         ax.add_patch(rect_patch)
 
         elem_obj = ax.text(
-            0, 0, str(elem_id),
-            ha='center', va='center',
+            0,
+            0,
+            str(elem_id),
+            ha="center",
+            va="center",
             fontdict=fontdict,
             transform=transform,
-            zorder=5
+            zorder=5,
         )
         text_objects.append(elem_obj)
 
@@ -296,8 +308,8 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     Plot the predefined mesh (16x6 cm), minimal whitespace, aspect=1,
     circles and rectangles in display coords, node coords listed to right.
     """
-    dofs_per_node = mesh_props['dofs_per_node']
-    el_type = mesh_props['el_type']
+    dofs_per_node = mesh_props["dofs_per_node"]
+    el_type = mesh_props["el_type"]
     ex, ey = cfc.coordxtr(edofs, coords, dofs)
     shape_path = Path(coords, closed=True)
 
@@ -305,20 +317,29 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     fig, ax = plt.subplots(figsize=(16 * cm_to_in, 6 * cm_to_in))
 
     # Draw mesh
-    cfv.draw_mesh(coords, edofs, dofs_per_node, el_type, filled=True, face_color=(0.875, 0.875, 0.875))
-    cfv.draw_node_circles(ex, ey, filled=True, marker_type='.')
+    cfv.draw_mesh(
+        coords,
+        edofs,
+        dofs_per_node,
+        el_type,
+        filled=True,
+        face_color=(0.875, 0.875, 0.875),
+    )
+    cfv.draw_node_circles(ex, ey, filled=True, marker_type=".")
 
     # Node & element numbers
-    legend_texts, node_texts = draw_node_numbers(ax, coords, shape_path, font_size=10, color='black')
-    elem_texts = draw_element_numbers(ax, ex, ey, font_size=10, color='black')
+    legend_texts, node_texts = draw_node_numbers(
+        ax, coords, shape_path, font_size=10, color="black"
+    )
+    _ = draw_element_numbers(ax, ex, ey, font_size=10, color="black")
 
     # Force aspect ratio 1 and remove selected spines
-    ax.set_aspect('equal', adjustable='datalim')
-    ax.spines[['right', 'top']].set_visible(False)
+    ax.set_aspect("equal", adjustable="datalim")
+    ax.spines[["right", "top"]].set_visible(False)
 
     # Show node coords externally
     node_info = "\n".join(legend_texts)
-    fig.text(0.82, 0.5, node_info, ha='left', va='center', fontsize=10)
+    fig.text(0.82, 0.5, node_info, ha="left", va="center", fontsize=10)
 
     # Subplot margins => minimal whitespace
     # Enough left & bottom for axes labels, enough right for text
@@ -328,19 +349,21 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     plane2d_version, simulation_index, plot_type = simulation_data
     plot_filename = f"{plane2d_version}_{simulation_index}_{plot_type}.pdf"
     plot_path = os.path.join(BASE_DIR, "data", "temp", plot_filename)
-    fig.savefig(plot_path, format='pdf', bbox_inches='tight')
+    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+    fig.savefig(plot_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
     return plot_path
 
 
 def plot_auto_mesh(coords, edofs, mesh_props, simulation_data):
-    dofs_per_node = mesh_props['dofs_per_node']
-    el_type = mesh_props['el_type']
+    dofs_per_node = mesh_props["dofs_per_node"]
+    el_type = mesh_props["el_type"]
     fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
     cfv.draw_mesh(coords, edofs, dofs_per_node, el_type=el_type, filled=True)
 
     # Save figure
-    plot_filename = '{}_{}_{}_mesh_auto.pdf'.format(*simulation_data)
+    plot_filename = "{}_{}_{}_mesh_auto.pdf".format(*simulation_data)
     plot_path = os.path.join(BASE_DIR, "data", "results", plot_filename)
-    fig.savefig(plot_path, format='pdf', bbox_inches='tight')
+    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+    fig.savefig(plot_path, format="pdf", bbox_inches="tight")
     plt.close(fig)

@@ -1,9 +1,17 @@
 import random
+
 import numpy as np
+
 from src.solver.plane2d_solver import load_plane2d_configuration
 
 
-def scale_plane_points(points: list, mesh_props: dict, min_scale: float=1.0, max_scale: float=2.0, step: float=0.1):
+def scale_plane_points(
+    points: list,
+    mesh_props: dict,
+    min_scale: float = 1.0,
+    max_scale: float = 2.0,
+    step: float = 0.1,
+):
     """
     Randomly select scale factors in x and y from the range [min_scale, max_scale] with given step.
     Returns the scaled points as a numpy array.
@@ -13,11 +21,11 @@ def scale_plane_points(points: list, mesh_props: dict, min_scale: float=1.0, max
     scale_y = random.choice(scale_options)
     scaled = [[x * scale_x, y * scale_y] for x, y in points]
     max_scale = max(scale_x, scale_y)
-    mesh_props['el_size_factor'] = mesh_props['el_size_factor'] * max_scale
+    mesh_props["el_size_factor"] = mesh_props["el_size_factor"] * max_scale
     return np.array(scaled), mesh_props
 
 
-def compute_max_dimensions(points: np.array):
+def compute_max_dimensions(points: np.ndarray):
     """
     Given a set of points, returns (max_x, max_y).
     """
@@ -53,16 +61,16 @@ def construct_material_data(ptype: int, material: dict, t: float):
     """
     Construct material_data for plane2d.
     """
-    return {
-        "ptype": ptype,
-        "E": material["E"],
-        "nu": material["nu"],
-        "t": t
-    }
+    return {"ptype": ptype, "E": material["E"], "nu": material["nu"], "t": t}
 
 
 def select_random_forces_with_scaling(
-        forces_options: dict, min_scale: float=1.0, max_scale: float=5.0, step: float=0.1, ptype: int=1):
+    forces_options: dict,
+    min_scale: float = 1.0,
+    max_scale: float = 5.0,
+    step: float = 0.1,
+    ptype: int = 1,
+):
     """
     Randomly assign random force values.
     """
@@ -74,7 +82,9 @@ def select_random_forces_with_scaling(
     selected_forces = {}
 
     for key in selected_forces_keys:
-        selected_forces[key] = forces_options[key].copy()  # create a copy so that the initial dictionary is not changed
+        selected_forces[key] = forces_options[
+            key
+        ].copy()  # create a copy so that the initial dictionary is not changed
         scale_factor = 1
         if ptype == 1:
             scale_factor = global_sign * random.choice(scaling_options)
@@ -107,11 +117,19 @@ def generate_plane2d_input_random(properties: dict, plane_version: str):
         forces: dictionary.
         mesh_props: dictionary.
     """
-    points, elements, material_options, boundary_conditions, forces_options, mesh_props = \
-        load_plane2d_configuration(properties, plane_version, 'random')
+    (
+        points,
+        elements,
+        material_options,
+        boundary_conditions,
+        forces_options,
+        mesh_props,
+    ) = load_plane2d_configuration(properties, plane_version, "random")
 
     # Scale points randomly
-    scaled_points, mesh_props = scale_plane_points(points, mesh_props, min_scale=1.0, max_scale=2.0, step=0.1)
+    scaled_points, mesh_props = scale_plane_points(
+        points, mesh_props, min_scale=1.0, max_scale=2.0, step=0.1
+    )
     # Get max dimensions
     max_x, max_y = compute_max_dimensions(scaled_points)
     # Randomly select ptype and compute t
@@ -125,4 +143,11 @@ def generate_plane2d_input_random(properties: dict, plane_version: str):
 
     # You may want to store the scaled mesh in mesh_props or update the points.
     # Assume mesh_props are unchanged.
-    return scaled_points.tolist(), elements, material_data, boundary_conditions, forces, mesh_props
+    return (
+        scaled_points.tolist(),
+        elements,
+        material_data,
+        boundary_conditions,
+        forces,
+        mesh_props,
+    )

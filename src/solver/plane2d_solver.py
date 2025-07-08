@@ -1,15 +1,16 @@
-import os
-import json
 import itertools
-import numpy as np
+import json
+import os
 
 # CalFEM for Python
 import calfem.core as cfc
 import calfem.geometry as cfg
 import calfem.mesh as cfm
 import calfem.utils as cfu
+import numpy as np
 
 from config import BASE_DIR
+
 
 def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions, forces):
     """
@@ -67,10 +68,10 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
     """
 
     # -- Extract material data --
-    ptype = material_data['ptype']  # 1 or 2
-    E = material_data['E']
-    nu = material_data['nu']
-    t = material_data['t']
+    ptype = material_data["ptype"]  # 1 or 2
+    E = material_data["E"]
+    nu = material_data["nu"]
+    t = material_data["t"]
 
     # Construct constitutive matrix
     ep = [ptype, t]
@@ -115,7 +116,7 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
     es_list = []
     for i in range(edofs.shape[0]):
         es_i, et_i = cfc.plants(ex[i, :], ey[i, :], ep, D, ed[i, :])
-        es_list.append(es_i[0]) # es_i is shape (1,3) => [σx, σy, τxy]
+        es_list.append(es_i[0])  # es_i is shape (1,3) => [σx, σy, τxy]
     es = np.array(es_list)  # (n_elements, 3)
 
     # 1) find max abs horizontal/vertical displacement
@@ -159,22 +160,24 @@ def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions
             max_sy_elem = i_el + 1
 
     result_summary = {
-        'max_u_val': float(max_u_val),
-        'max_u_node': max_u_node,
-        'max_v_val': float(max_v_val),
-        'max_v_node': max_v_node,
-        'max_sx_val': float(max_sx_val),
-        'max_sx_elem': max_sx_elem,
-        'max_sy_val': float(max_sy_val),
-        'max_sy_elem': max_sy_elem,
-        'nnodes': coords.shape[0],
-        'nels': edofs.shape[0],
+        "max_u_val": float(max_u_val),
+        "max_u_node": max_u_node,
+        "max_v_val": float(max_v_val),
+        "max_v_node": max_v_node,
+        "max_sx_val": float(max_sx_val),
+        "max_sx_elem": max_sx_elem,
+        "max_sy_val": float(max_sy_val),
+        "max_sy_elem": max_sy_elem,
+        "nnodes": coords.shape[0],
+        "nels": edofs.shape[0],
     }
 
     return a, r, es, ed, result_summary
 
 
-def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_conditions: dict, forces: dict):
+def build_plane2d_with_predefined_mesh(
+    points: list, elements: list, boundary_conditions: dict, forces: dict
+):
     """
     Build a plane stress/strain problem given a meshed geometry.
     """
@@ -192,11 +195,12 @@ def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_co
     for elem in elements:
         n1, n2, n3 = (elem[0] - 1, elem[1] - 1, elem[2] - 1)
         edofs_list.append([*dofs[n1], *dofs[n2], *dofs[n3]])
-    edofs = np.array(edofs_list, dtype='int32')
+    edofs = np.array(edofs_list, dtype="int32")
 
     # Build bdofs from boundary_conditions & loads
     bdofs = {}
     import itertools
+
     # Boundary conditions
     for _, bc_data in boundary_conditions.items():
         marker = bc_data["marker"]
@@ -215,11 +219,13 @@ def build_plane2d_with_predefined_mesh(points: list, elements: list, boundary_co
     return coords, dofs, edofs, bdofs
 
 
-def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces: dict, mesh_props: dict):
+def build_plane2d_with_auto_mesh(
+    points: list, boundary_conditions: dict, forces: dict, mesh_props: dict
+):
     g = cfg.geometry()
 
     for node_id, (x, y) in enumerate(points):
-        g.point([x, y], marker=node_id+1)  # 1-based marked
+        g.point([x, y], marker=node_id + 1)  # 1-based marked
 
     n_points_geom = len(g.points)
 
@@ -227,7 +233,9 @@ def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces
     for i in range(n_points_geom):
         start_node = i
         end_node = (i + 1) % n_points_geom
-        g.spline([start_node, end_node], marker=i+101)  # curves are marked 1-based with a 100 offset
+        g.spline(
+            [start_node, end_node], marker=i + 101
+        )  # curves are marked 1-based with a 100 offset
 
     # Create a surface from all curves
     g.surface(list(g.curves.keys()))
@@ -245,31 +253,42 @@ def build_plane2d_with_auto_mesh(points: list, boundary_conditions: dict, forces
 def load_plane2d_configuration(properties: dict, plane_version: str, mode: str):
     if mode == "predefined":
         plane_data = properties[plane_version]
-        points = plane_data['points']
-        elements = plane_data['elements']
-        material_data = plane_data['material_data']
-        boundary_conditions = plane_data['boundary_conditions']
-        forces = plane_data['forces']
+        points = plane_data["points"]
+        elements = plane_data["elements"]
+        material_data = plane_data["material_data"]
+        boundary_conditions = plane_data["boundary_conditions"]
+        forces = plane_data["forces"]
         mesh_props = {
             "el_type": plane_data["el_type"],
             "dofs_per_node": plane_data["dofs_per_node"],
-            "el_size_factor": plane_data["el_size_factor"]
+            "el_size_factor": plane_data["el_size_factor"],
         }
         return points, elements, material_data, boundary_conditions, forces, mesh_props
 
     elif mode == "random":
-        plane_data = properties['plane_configurations'][plane_version]
-        points = plane_data['points']
-        elements = plane_data['elements']
-        boundary_conditions = plane_data['boundary_conditions']  # e.g., contains "possible_edges" and "corresponding_points"
-        forces = plane_data['forces']  # e.g., "possible_points", "force_range", "possible_dimensions"
-        material_options = properties['materials']  # Use global materials
+        plane_data = properties["plane_configurations"][plane_version]
+        points = plane_data["points"]
+        elements = plane_data["elements"]
+        boundary_conditions = plane_data[
+            "boundary_conditions"
+        ]  # e.g., contains "possible_edges" and "corresponding_points"
+        forces = plane_data[
+            "forces"
+        ]  # e.g., "possible_points", "force_range", "possible_dimensions"
+        material_options = properties["materials"]  # Use global materials
         mesh_props = {
             "el_type": plane_data["el_type"],
             "dofs_per_node": plane_data["dofs_per_node"],
-            "el_size_factor": plane_data["el_size_factor"]
+            "el_size_factor": plane_data["el_size_factor"],
         }
-        return points, elements, material_options, boundary_conditions, forces, mesh_props
+        return (
+            points,
+            elements,
+            material_options,
+            boundary_conditions,
+            forces,
+            mesh_props,
+        )
     else:
         raise ValueError("Unknown mode")
 
@@ -277,17 +296,19 @@ def load_plane2d_configuration(properties: dict, plane_version: str, mode: str):
 def save_plane2d_input_and_results(simulation_data, data_to_save):
     data_to_save["a"] = list(itertools.chain(*data_to_save["a"]))
     mode, plane2d_version, simulation_index = simulation_data
-    results_dir = os.path.join(BASE_DIR, 'data', 'results')
+    results_dir = os.path.join(BASE_DIR, "data", "results")
     os.makedirs(results_dir, exist_ok=True)
 
-    results_filename = '_'.join([mode, plane2d_version, str(simulation_index), 'results']) + '.json'
+    results_filename = "_".join([mode, plane2d_version, str(simulation_index), "results"]) + ".json"
     results_path = os.path.join(results_dir, results_filename)
 
-    with open(results_path, 'w', encoding='utf-8') as f_out:
+    with open(results_path, "w", encoding="utf-8") as f_out:
         json.dump(data_to_save, f_out, indent=2)
 
 
-def find_displacement_at_predefined_nodes_in_auto_mesh(coords_pre, result_summary, coords_auto, dofs_auto, a_auto):
+def find_displacement_at_predefined_nodes_in_auto_mesh(
+    coords_pre, result_summary, coords_auto, dofs_auto, a_auto
+):
     """
     For each node in predefined coords, find the closest node in auto mesh and
     return that node's horizontal & vertical displacement from a_auto.
@@ -296,7 +317,7 @@ def find_displacement_at_predefined_nodes_in_auto_mesh(coords_pre, result_summar
     for i_pre, (x_pre, y_pre) in enumerate(coords_pre):
         # find closest node in coords_auto
         best_index = None
-        best_dist_sq = float('inf')
+        best_dist_sq = float("inf")
         for i_auto, (x_auto, y_auto) in enumerate(coords_auto):
             dx = x_auto - x_pre
             dy = y_auto - y_pre
@@ -312,22 +333,27 @@ def find_displacement_at_predefined_nodes_in_auto_mesh(coords_pre, result_summar
         ux_auto = a_auto[a_index_x, 0]
         vy_auto = a_auto[a_index_y, 0]
 
-        results.append({
-            "i_pre_node": i_pre + 1,
-            "pre_node_coords": [float(x_pre), float(y_pre)],
-            "auto_node_index": i_node_auto + 1,
-            "auto_node_coords": [float(coords_auto[i_node_auto, 0]), float(coords_auto[i_node_auto, 1])],
-            "ux_auto": float(ux_auto),
-            "vy_auto": float(vy_auto),
-            "distance": float(np.sqrt(best_dist_sq))
-        })
-    u_node = result_summary['max_u_node']
-    v_node = result_summary['max_v_node']
+        results.append(
+            {
+                "i_pre_node": i_pre + 1,
+                "pre_node_coords": [float(x_pre), float(y_pre)],
+                "auto_node_index": i_node_auto + 1,
+                "auto_node_coords": [
+                    float(coords_auto[i_node_auto, 0]),
+                    float(coords_auto[i_node_auto, 1]),
+                ],
+                "ux_auto": float(ux_auto),
+                "vy_auto": float(vy_auto),
+                "distance": float(np.sqrt(best_dist_sq)),
+            }
+        )
+    u_node = result_summary["max_u_node"]
+    v_node = result_summary["max_v_node"]
     automesh_corresponding_displacements = {
-        "u_val": results[u_node-1]["ux_auto"],
-        "u_node": results[u_node-1]["auto_node_index"],
-        "v_val": results[v_node-1]["vy_auto"],
-        "v_node": results[v_node-1]["auto_node_index"],
+        "u_val": results[u_node - 1]["ux_auto"],
+        "u_node": results[u_node - 1]["auto_node_index"],
+        "v_val": results[v_node - 1]["vy_auto"],
+        "v_node": results[v_node - 1]["auto_node_index"],
     }
 
     return automesh_corresponding_displacements

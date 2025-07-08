@@ -1,7 +1,37 @@
-data/results
-data/pdfs
-data/final
-data/temp
-data/frame_descriptions
-data/frame_results
-data/all
+# --- Python generics -------------------------------------------------------
+*.py[cod]
+__pycache__/
+*.so                     # compiled extensions, just in case
+*.pyd
+
+# --- Environments ----------------------------------------------------------
+.venv/
+env/
+venv/
+
+# --- Test & coverage artifacts --------------------------------------------
+.pytest_cache/
+.coverage
+coverage.xml
+
+# --- Packaging -------------------------------------------------------------
+build/
+dist/
+*.egg-info/
+
+# --- IDEs & editors --------------------------------------------------------
+.idea/
+.vscode/
+
+# --- Project data ----------------------------------------------------------
+data/results/
+data/pdfs/
+data/final/
+data/temp/
+data/frame_descriptions/
+data/frame_results/
+data/all/
+
+# --- Mac & Windows ---------------------------------------------------------
+.DS_Store
+Thumbs.db

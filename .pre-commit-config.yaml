@@ -1,0 +1,30 @@
+repos:
+  # ---------- Ruff (lint + import-sort) ----------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.5
+    hooks:
+      - id: ruff
+        args: [--config=pyproject.toml]
+
+  # ---------- Black (code formatter) -------------
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        args: [--config=pyproject.toml]
+
+  # ---------- mypy (static types) ----------------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        entry: mypy --config-file pyproject.toml
+
+  # ---------- Tests ------------------------------
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest -q            # fast, quiet run
+        language: system            # use your active Python
+        pass_filenames: false       # always run full suite

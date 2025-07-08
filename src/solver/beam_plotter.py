@@ -1,28 +1,40 @@
-from calfem.vis_mpl import *
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
 from adjustText import adjust_text
-from config import BASE_DIR, ANNOTATION_DISPLACEMENT_MINIMUM, cm_to_in, m_to_cm
-from matplotlib.backends.backend_pdf import PdfPages
+
+# from calfem.vis_mpl import *
+from calfem.vis_mpl import pltstyle2, scalfact2
+
+from config import BASE_DIR, cm_to_in, m_to_cm
+
+# from matplotlib.backends.backend_pdf import PdfPages
 
 
 def plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, simulation_index=0):
-    plt.rcParams.update({'font.size': 9})
+    plt.rcParams.update({"font.size": 9})
     simulation_data = [mode, beam_version, simulation_index]
-    plot_filename = '{}_{}_{}.pdf'.format(*simulation_data)
-    plot_path = os.path.join(BASE_DIR, 'data', 'results', plot_filename)
-    plot_functions = [plot_beam_displacements, plot_beam_shear_forces, plot_beam_moments]
-    plot_titles = ['Displacement, cm', 'Shear Force, kN', 'Moment, kNm']
-    max_result_keys = ['displacement', 'shear_force', 'moment']
+    plot_filename = "{}_{}_{}.pdf".format(*simulation_data)
+    plot_path = os.path.join(BASE_DIR, "data", "results", plot_filename)
+    plot_functions = [
+        plot_beam_displacements,
+        plot_beam_shear_forces,
+        plot_beam_moments,
+    ]
+    plot_titles = ["Displacement, cm", "Shear Force, kN", "Moment, kNm"]
+    max_result_keys = ["displacement", "shear_force", "moment"]
 
     # Create a figure with three subplots
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16 * cm_to_in, 25 * cm_to_in))
     for ax, plot_function, title, key in zip(axes, plot_functions, plot_titles, max_result_keys):
         plot_function(ax, ex, ey, element_results, max_results[key])
-        ax.axis('off')
+        ax.axis("off")
         ax.set_title(title)
 
     plt.tight_layout()
 
-    fig.savefig(plot_path, format='pdf')
+    fig.savefig(plot_path, format="pdf")
     plt.close(fig)
 
 
@@ -31,10 +43,18 @@ def plot_beam_displacements(ax, ex, ey, element_results, max_result):
     texts = []
     annotated_positions = set()
     for i, result in element_results.items():
-        edi = result['edi']
+        edi = result["edi"]
         dispbeam2_ax(ax, ex[i], ey[i], edi, [1, 2, 3], scale_factor)
-        annotate_values(ax, ex[i], ey[i], edi[:, 1], scale_factor, texts, annotated_positions,
-                        value_conversion=lambda v: v * m_to_cm)
+        annotate_values(
+            ax,
+            ex[i],
+            ey[i],
+            edi[:, 1],
+            scale_factor,
+            texts,
+            annotated_positions,
+            value_conversion=lambda v: v * m_to_cm,
+        )
     add_annotations(ax, texts)
 
 
@@ -43,7 +63,7 @@ def plot_beam_shear_forces(ax, ex, ey, element_results, max_result):
     texts = []
     annotated_positions = set()
     for i, result in element_results.items():
-        shear_force = result['es'][:, 1]
+        shear_force = result["es"][:, 1]
         secforce2_ax_fill(ax, ex[i], ey[i], shear_force, [2, 1], scale_factor)
         annotate_values(ax, ex[i], ey[i], -shear_force, scale_factor, texts, annotated_positions)
     add_annotations(ax, texts)
@@ -54,19 +74,27 @@ def plot_beam_moments(ax, ex, ey, element_results, max_result):
     texts = []
     annotated_positions = set()
     for i, result in element_results.items():
-        moments = result['es'][:, 2]
+        moments = result["es"][:, 2]
         secforce2_ax_fill(ax, ex[i], ey[i], moments, [2, 1], scale_factor)
         annotate_values(ax, ex[i], ey[i], -moments, scale_factor, texts, annotated_positions)
     add_annotations(ax, texts)
 
 
-def annotate_values(ax, ex, ey, data, scale_factor, texts, annotated_positions, value_conversion=None):
+def annotate_values(
+    ax, ex, ey, data, scale_factor, texts, annotated_positions, value_conversion=None
+):
     n_points = len(data)
     x_positions = np.linspace(ex[0], ex[1], n_points)
     y_positions = np.linspace(ey[0], ey[1], n_points)
     max_idx = np.argmax(data)
     min_idx = np.argmin(data)
-    indices = [0, len(data) // 2, -1, max_idx, min_idx]  # Indices for start, mid, end, max, and min positions
+    indices = [
+        0,
+        len(data) // 2,
+        -1,
+        max_idx,
+        min_idx,
+    ]  # Indices for start, mid, end, max, and min positions
 
     for idx in indices:
         position_x = x_positions[idx]
@@ -92,10 +120,10 @@ def annotate_values(ax, ex, ey, data, scale_factor, texts, annotated_positions, 
         text = ax.text(
             position_x + offset_x,
             position_y + offset_y,
-            f'{np.abs(value):.2f}',
-            ha='center',
-            va='center',
-            bbox=dict(boxstyle="round4,pad=0.2", fc='white', ec='gray', alpha=0.8)
+            f"{np.abs(value):.2f}",
+            ha="center",
+            va="center",
+            bbox=dict(boxstyle="round4,pad=0.2", fc="white", ec="gray", alpha=0.8),
         )
         texts.append((text, position_x, position_y))
 
@@ -112,13 +140,13 @@ def calculate_offset(dx, dy, value, offset_magnitude):
     if dy > 0:
         offset_x = -offset_magnitude * abs(unit_perp_x)  # Push left
     elif dy < 0:
-        offset_x = offset_magnitude * abs(unit_perp_x)   # Push right
+        offset_x = offset_magnitude * abs(unit_perp_x)  # Push right
     else:
         offset_x = 0  # No horizontal offset
 
     # Determine vertical offset based on value position
     if value >= 0:
-        offset_y = offset_magnitude * abs(unit_perp_y)   # Push up
+        offset_y = offset_magnitude * abs(unit_perp_y)  # Push up
     else:
         offset_y = -offset_magnitude * abs(unit_perp_y)  # Push down
 
@@ -134,23 +162,16 @@ def add_annotations(ax, texts):
         force_text=(0.5, 0.5),
         force_points=(0.2, 0.5),
         min_arrow_len=0.001,
-        lim=1000
+        lim=1000,
     )
 
     for text, position_x, position_y in texts:
         text_pos = text.get_position()
         ax.annotate(
-            '',
+            "",
             xy=(position_x, position_y),
             xytext=text_pos,
-            arrowprops=dict(
-                arrowstyle="->",
-                color='gray',
-                lw=1.1,
-                shrinkA=4,
-                shrinkB=0,
-                alpha=0.6
-            )
+            arrowprops=dict(arrowstyle="->", color="gray", lw=1.1, shrinkA=4, shrinkB=0, alpha=0.6),
         )
 
 
@@ -239,14 +260,23 @@ def dispbeam2_ax(ax, ex, ey, edi, plotpar=[2, 1, 1], sfac=None):
     ax.plot(xc, yc, color=line_color, linewidth=1)
 
     # Plot element
-    ax.plot(ex, ey, color='black', linewidth=1)
+    ax.plot(ex, ey, color="black", linewidth=1)
 
     A1 = np.array([A[0, 0], A[Nbr - 1, 0]]).reshape(1, 2)
     A2 = np.array([A[0, 1], A[Nbr - 1, 1]]).reshape(1, 2)
     draw_node_circles_ax(ax, A1, A2, color=node_color, filled=False, marker_type=node_style)
 
 
-def draw_node_circles_ax(ax, ex, ey, title="", color=(0, 0, 0), face_color=(0.8, 0.8, 0.8), filled=False, marker_type="o"):
+def draw_node_circles_ax(
+    ax,
+    ex,
+    ey,
+    title="",
+    color=(0, 0, 0),
+    face_color=(0.8, 0.8, 0.8),
+    filled=False,
+    marker_type="o",
+):
     """
     Draws wire mesh of model in 2D or 3D. Returns the Mesh object that represents
     the mesh.
@@ -273,10 +303,10 @@ def draw_node_circles_ax(ax, ex, ey, title="", color=(0, 0, 0), face_color=(0.8,
             Boolean. Faces will be drawn if True. Otherwise only the wire is drawn. Default False.
     """
 
-    nel = ex.shape[0]
-    nnodes = ex.shape[1]
-
-    nodes = []
+    # nel = ex.shape[0]
+    # nnodes = ex.shape[1]
+    #
+    # nodes = []
 
     x = []
     y = []
@@ -295,7 +325,7 @@ def draw_node_circles_ax(ax, ex, ey, title="", color=(0, 0, 0), face_color=(0.8,
 
     ax.set_aspect("equal")
 
-    if title != None:
+    if title is not None:
         ax.set(title=title)
 
 
