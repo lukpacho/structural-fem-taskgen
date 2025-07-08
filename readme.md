@@ -1,26 +1,7 @@
-beam_project/
-│
-├── src/
-│   ├── __init__.py
-│   ├── generator.py
-│   ├── geometry.py
-│   ├── properties.py
-│   ├── solver/
-│   │   ├── __init__.py
-│   │   ├── beam_solver.py  # Python-based solver to replace Octave functions
-│   │
-│   ├── pdf_generator/
-│   │   ├── __init__.py
-│   │   ├── latex_template.tex
-│   │   ├── pdf_generator.py
-│
-├── data/
-│   ├── results/
-│   ├── temp/
-│
-├── tests/
-│   ├── __init__.py
-│   ├── test_generator.py
-│   ├── test_solver.py
-│
-└── main.py
+[![Tests](https://github.com/lukpacho/structural-fem-taskgen/actions/workflows/ci.yml/badge.svg)](https://github.com/lukpacho/structural-fem-taskgen/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/<user>/<repo>/graph/badge.svg)](https://codecov.io/gh/<user>/<repo>)
+
+![Docker](https://img.shields.io/badge/image-ghcr.io%2F${{github.repository}}-blue)
+
+
+
