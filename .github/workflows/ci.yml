@@ -38,3 +38,41 @@ jobs:
 
       # 8) run unit tests (located in ./tests)
       - run: pytest -q
+
+  image:
+      if: "${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}"
+      needs: test
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - uses: docker/setup-qemu-action@v3   # multi-arch emulation
+        - uses: docker/setup-buildx-action@v3
+
+        # ---------- optional: cache layers between builds ----------
+        - uses: actions/cache@v4
+          with:
+            path: /tmp/.buildx-cache
+            key: ${{ runner.os }}-buildx-${{ github.sha }}
+            restore-keys: ${{ runner.os }}-buildx-
+
+        - uses: docker/login-action@v3
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        - uses: docker/build-push-action@v5
+          with:
+            context: .
+            push: true
+            platforms: linux/amd64,linux/arm64
+            tags: |
+              ghcr.io/${{ github.repository }}:latest
+              ghcr.io/${{ github.repository }}:${{ github.sha }}
+            cache-from: type=local,src=/tmp/.buildx-cache
+            cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
