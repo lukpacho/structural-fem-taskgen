@@ -15,10 +15,8 @@ RUN apt-get update -y && \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Copy sources and build wheel
-COPY pyproject.toml requirements.txt README.md .
+COPY pyproject.toml requirements.txt README.md ./
 COPY src/ src/
-COPY templates/ templates/
-COPY data/ data/
 
 RUN pip install build && \
     python -m build --wheel --outdir /dist
