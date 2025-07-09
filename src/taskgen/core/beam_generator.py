@@ -5,12 +5,7 @@ from pprint import pprint
 
 import numpy as np
 
-from config import BASE_DIR
-
-
-def load_properties(path):
-    with open(path, "r") as file:
-        return json.load(file)
+from .config import load_properties, results_dir
 
 
 def save_beam_input(geometry, element_properties, loads, mode, beam_version, simulation_index=0):
@@ -26,7 +21,7 @@ def save_beam_input(geometry, element_properties, loads, mode, beam_version, sim
     - simulation_index: Optional index for distinguishing between multiple generated simulations.
     """
     input_filename = f"{mode}_{beam_version}_{simulation_index}_input.json"
-    path = os.path.join(BASE_DIR, "data", "results", input_filename)
+    path = os.path.join(results_dir(), input_filename)
 
     data = {
         "geometry": convert_to_json_serializable(geometry),
@@ -271,8 +266,7 @@ def generate_loads(geometry, properties, num_P=1, num_M=1, num_q=1):
 
 if __name__ == "__main__":
     version = "beam3"
-    properties_path = os.path.join(BASE_DIR, "data", "properties.json")
-    properties = load_properties(properties_path)["random"]
+    properties = load_properties()["random"]
     geometry, max_length = generate_geometry(version, properties)
     pprint(["Selected Geometry:", geometry])
     element_properties = generate_element_properties(geometry, properties)

@@ -1,28 +1,27 @@
-### main.py
+### orchestrator.py
 import argparse
-import os
 import warnings
 
 # Beam imports
-from src.generators.beam_generator import (
+from .beam_generator import (
     generate_element_properties,
     generate_geometry,
     generate_loads,
-    load_properties,
     save_beam_input,
 )
-from src.generators.plane2d_generator import generate_plane2d_input_random
-from src.pdf_generator.description_pdf_generator import (
+from .beam_plotter import plot_beam_results
+from .beam_solver import solve_beam
+from .config import load_properties
+from .description_pdf_generator import (
     generate_description_pdf,
     prepare_beam_data_for_latex,
     prepare_plane2d_data_for_latex,
 )
-from src.solver.beam_plotter import plot_beam_results
-from src.solver.beam_solver import solve_beam
-from src.solver.plane2d_plotter import plot_plane2d_displacement, plot_plane2d_stresses
+from .plane2d_generator import generate_plane2d_input_random
+from .plane2d_plotter import plot_plane2d_displacement, plot_plane2d_stresses
 
 # Plane2D imports
-from src.solver.plane2d_solver import (
+from .plane2d_solver import (
     build_plane2d_with_auto_mesh,
     build_plane2d_with_predefined_mesh,
     edofs_to_enodes,
@@ -379,9 +378,7 @@ def main():
     if args.mode == "predefined" and args.num_simulations != 1:
         raise ValueError("Multiple simulations are not allowed in predefined mode.")
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    properties_path = os.path.join(current_dir, "data", "properties.json")
-    properties = load_properties(properties_path)[args.mode]
+    properties = load_properties()[args.mode]
 
     if args.problem_type == "beam":
         if args.mode == "random":
@@ -428,7 +425,3 @@ def main():
                 mode=args.mode,
                 generate_pdf=args.generate_pdf,
             )
-
-
-if __name__ == "__main__":
-    main()

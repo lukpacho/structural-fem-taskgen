@@ -3,14 +3,14 @@ import warnings
 
 import numpy as np
 
-from src.solver.plane2d_plotter import plot_auto_mesh, plot_predefined_mesh
+from src.taskgen.core.plane2d_plotter import plot_auto_mesh, plot_predefined_mesh
 
 # CalFEM for Python
 # import calfem.core as cfc
 # import calfem.geometry as cfg
 # import calfem.mesh as cfm
 # import calfem.vis_mpl as cfv
-from src.solver.plane2d_solver import (
+from src.taskgen.core.plane2d_solver import (
     build_plane2d_with_auto_mesh,
     build_plane2d_with_predefined_mesh,
     solve_plane2d,

@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from src.solver.beam_solver import solve_beam
+from src.taskgen.core.beam_solver import solve_beam
 
 # from src.solver.beam_plotter import plot_beam_results, plot_beam_displacements
 

@@ -1,25 +1,21 @@
-import json
-import os
 import unittest
 from unittest.mock import patch
 
 import numpy as np
 
-from src.generators.beam_generator import (
+from src.taskgen.core.beam_generator import (
     generate_element_properties,
     generate_geometry,
     generate_loads,
 )
+from src.taskgen.core.config import load_properties
 
 
 class TestGenerator(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Load the properties JSON file once and use it for all tests
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        properties_path = os.path.join(current_dir, "..", "data", "properties.json")
-        with open(properties_path, "r") as file:
-            cls.properties = json.load(file)["random"]
+        cls.properties = load_properties()["random"]
 
     def test_generate_geometry_detailed_checks(self):
         for version in self.properties["beam_configurations"].keys():

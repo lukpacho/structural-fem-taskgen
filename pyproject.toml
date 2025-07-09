@@ -1,3 +1,50 @@
+[build-system]
+requires      = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "structural_fem_taskgen_cli"
+version = "0.1.1"
+description = "Structural FEM task generator and solver"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{name = "Lukasz Pachocki", email = "pachockilukasz@gmail.com"}]
+dependencies = [
+  "numpy>=1.26.4",
+  "adjustText>=1.3.0",
+  "Jinja2>=3.1.4",
+  "matplotlib>=3.9.0",
+  "calfem-python>=3.6.8",
+  "gmsh>=4.13.1",
+  "typer>=0.16.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  "black",
+  "mypy",
+  "build",
+  "twine"
+]
+
+[project.scripts]
+taskgen = "taskgen.cli:app"
+
+[project.urls]
+Repository = "https://github.com/lukpacho/structural-fem-taskgen"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/taskgen"]
+
+[tool.hatch.build]
+include = [
+  "src/taskgen/templates/*.tex",
+  "src/taskgen/data/*.json",
+]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
@@ -25,7 +72,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["structural_fem_taskgen"]
+known-first-party = ["taskgen"]
 combine-as-imports = true
 
 [tool.mypy]
@@ -39,7 +86,3 @@ strict = false
 [tool.pytest.ini_options]
 addopts = "-q -ra"
 testpaths = ["tests"]
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"

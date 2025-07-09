@@ -24,13 +24,13 @@ dist/
 .vscode/
 
 # --- Project data ----------------------------------------------------------
-data/results/
-data/pdfs/
-data/final/
-data/temp/
-data/frame_descriptions/
-data/frame_results/
-data/all/
+src/taskgen/data/results/
+src/taskgen/data/pdfs/
+src/taskgen/data/final/
+src/taskgen/data/temp/
+src/taskgen/data/frame_descriptions/
+src/taskgen/data/frame_results/
+src/taskgen/data/all/
 
 # --- Mac & Windows ---------------------------------------------------------
 .DS_Store

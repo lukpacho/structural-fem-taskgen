@@ -5,15 +5,16 @@ import shutil
 import subprocess
 from datetime import datetime
 
-from config import LATEX_TEMPLATES_DIR, PDFS_DIR, TEMP_DIR
-from src.solver.plane2d_plotter import plot_predefined_mesh
+from jinja2 import Environment, FileSystemLoader
+
+from .config import TEMPLATES_DIR, pdfs_dir, temp_dir
+from .plane2d_plotter import plot_predefined_mesh
 
 
-def latex_jinja_env(template_folder=LATEX_TEMPLATES_DIR):
+def latex_jinja_env() -> Environment:
     """
     Create a Jinja2 environment that can parse LaTeX templates.
     """
-    from jinja2 import Environment, FileSystemLoader
 
     return Environment(
         block_start_string="\BLOCK{",
@@ -27,7 +28,7 @@ def latex_jinja_env(template_folder=LATEX_TEMPLATES_DIR):
         trim_blocks=True,
         lstrip_blocks=True,
         autoescape=False,
-        loader=FileSystemLoader(searchpath=template_folder),
+        loader=FileSystemLoader(str(TEMPLATES_DIR)),
     )
 
 
@@ -36,7 +37,7 @@ def render_latex_template(template_file, output_name, data):
     template = template_env.get_template(template_file)
 
     output_text = template.render(data)
-    with open(os.path.join(TEMP_DIR, f"{output_name}.tex"), "w", encoding="utf-8") as text_file:
+    with open(os.path.join(temp_dir(), f"{output_name}.tex"), "w", encoding="utf-8") as text_file:
         text_file.write(output_text)
 
 
@@ -50,7 +51,7 @@ def compile_latex_to_pdf(output_name):
             "lualatex",
             "--shell-escape",
             "--enable-write18",
-            f"--output-directory={TEMP_DIR}",
+            f"--output-directory={temp_dir()}",
             f"{output_name}.tex",
         ],
         check=True,
@@ -59,17 +60,17 @@ def compile_latex_to_pdf(output_name):
     pdf_file = f"{output_name}.pdf"
     tex_file = f"{output_name}.tex"
 
-    shutil.move(os.path.join(TEMP_DIR, pdf_file), os.path.join(PDFS_DIR, pdf_file))
-    shutil.move(os.path.join(TEMP_DIR, tex_file), os.path.join(PDFS_DIR, tex_file))
+    shutil.move(os.path.join(temp_dir(), pdf_file), os.path.join(pdfs_dir(), pdf_file))
+    shutil.move(os.path.join(temp_dir(), tex_file), os.path.join(pdfs_dir(), tex_file))
 
-    for file in os.listdir(TEMP_DIR):
-        os.remove(os.path.join(TEMP_DIR, file))
+    for file in os.listdir(temp_dir()):
+        os.remove(os.path.join(temp_dir(), file))
 
 
 def generate_description_pdf(template_file, output_name, data):
     """
     Generate a PDF report from a LaTeX template and provided data.
-    :param template_file: Path to the Jinja2 templated LaTeX file.
+    :param template_file: Jinja2 templated LaTeX filename.
     :param data: Dictionary containing the data to render into the template.
     :param output_name: Base name for the output tex and PDF files.
     """
@@ -504,4 +505,8 @@ if __name__ == "__main__":
         beam_version, simulation_index, geometry, element_properties, loads
     )
 
-    generate_description_pdf("beam_template.tex", "output_beam_report", data)
+    generate_description_pdf(
+        os.path.join(TEMPLATES_DIR, "beam_template.tex"),
+        os.path.join(temp_dir(), "output_beam_report"),
+        data,
+    )

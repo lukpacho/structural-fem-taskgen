@@ -7,7 +7,7 @@ from adjustText import adjust_text
 # from calfem.vis_mpl import *
 from calfem.vis_mpl import pltstyle2, scalfact2
 
-from config import BASE_DIR, cm_to_in, m_to_cm
+from .config import CM_TO_IN, M_TO_CM, results_dir
 
 # from matplotlib.backends.backend_pdf import PdfPages
 
@@ -16,7 +16,7 @@ def plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, 
     plt.rcParams.update({"font.size": 9})
     simulation_data = [mode, beam_version, simulation_index]
     plot_filename = "{}_{}_{}.pdf".format(*simulation_data)
-    plot_path = os.path.join(BASE_DIR, "data", "results", plot_filename)
+    plot_path = os.path.join(results_dir(), plot_filename)
     plot_functions = [
         plot_beam_displacements,
         plot_beam_shear_forces,
@@ -26,7 +26,7 @@ def plot_beam_results(ex, ey, element_results, max_results, mode, beam_version, 
     max_result_keys = ["displacement", "shear_force", "moment"]
 
     # Create a figure with three subplots
-    fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16 * cm_to_in, 25 * cm_to_in))
+    fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(16 * CM_TO_IN, 25 * CM_TO_IN))
     for ax, plot_function, title, key in zip(axes, plot_functions, plot_titles, max_result_keys):
         plot_function(ax, ex, ey, element_results, max_results[key])
         ax.axis("off")
@@ -53,7 +53,7 @@ def plot_beam_displacements(ax, ex, ey, element_results, max_result):
             scale_factor,
             texts,
             annotated_positions,
-            value_conversion=lambda v: v * m_to_cm,
+            value_conversion=lambda v: v * M_TO_CM,
         )
     add_annotations(ax, texts)
 
@@ -136,7 +136,7 @@ def calculate_offset(dx, dy, value, offset_magnitude):
     unit_perp_x = -unit_tangent_y
     unit_perp_y = unit_tangent_x
 
-    # Determine horizontal offset based on beam slope
+    # Determine horizontal offset based on beam's slope
     if dy > 0:
         offset_x = -offset_magnitude * abs(unit_perp_x)  # Push left
     elif dy < 0:

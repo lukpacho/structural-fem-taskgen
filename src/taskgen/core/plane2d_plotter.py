@@ -11,7 +11,7 @@ import numpy as np
 from matplotlib.patches import Circle, Rectangle
 from matplotlib.path import Path
 
-from config import BASE_DIR, cm_to_in
+from .config import CM_TO_IN, results_dir, temp_dir
 
 # Set global font properties: Times New Roman, size 10.
 mpl.rcParams["font.family"] = "Times New Roman"
@@ -87,7 +87,7 @@ def plot_plane2d_stresses(
     else:
         fname = f"{mesh_name}_{component}.pdf"
 
-    plot_path = os.path.join(BASE_DIR, "data", "results", fname)
+    plot_path = os.path.join(results_dir(), fname)
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close()
     return plot_path
@@ -170,7 +170,7 @@ def plot_plane2d_displacement(
     else:
         fname = f"{mesh_name}_{component}.pdf"
 
-    plot_path = os.path.join(BASE_DIR, "data", "results", fname)
+    plot_path = os.path.join(results_dir(), fname)
     plt.savefig(plot_path, bbox_inches="tight")
     plt.close()
     return plot_path
@@ -314,7 +314,7 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     shape_path = Path(coords, closed=True)
 
     # Figure size: 16 cm x 6 cm
-    fig, ax = plt.subplots(figsize=(16 * cm_to_in, 6 * cm_to_in))
+    fig, ax = plt.subplots(figsize=(16 * CM_TO_IN, 6 * CM_TO_IN))
 
     # Draw mesh
     cfv.draw_mesh(
@@ -348,7 +348,7 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     # Save with bbox_inches='tight' to remove extra page margin
     plane2d_version, simulation_index, plot_type = simulation_data
     plot_filename = f"{plane2d_version}_{simulation_index}_{plot_type}.pdf"
-    plot_path = os.path.join(BASE_DIR, "data", "temp", plot_filename)
+    plot_path = os.path.join(temp_dir(), plot_filename)
     os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     fig.savefig(plot_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
@@ -358,12 +358,12 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
 def plot_auto_mesh(coords, edofs, mesh_props, simulation_data):
     dofs_per_node = mesh_props["dofs_per_node"]
     el_type = mesh_props["el_type"]
-    fig, ax = plt.subplots(figsize=(16 * cm_to_in, 8 * cm_to_in))
+    fig, ax = plt.subplots(figsize=(16 * CM_TO_IN, 8 * CM_TO_IN))
     cfv.draw_mesh(coords, edofs, dofs_per_node, el_type=el_type, filled=True)
 
     # Save figure
     plot_filename = "{}_{}_{}_mesh_auto.pdf".format(*simulation_data)
-    plot_path = os.path.join(BASE_DIR, "data", "results", plot_filename)
+    plot_path = os.path.join(results_dir(), plot_filename)
     os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     fig.savefig(plot_path, format="pdf", bbox_inches="tight")
     plt.close(fig)

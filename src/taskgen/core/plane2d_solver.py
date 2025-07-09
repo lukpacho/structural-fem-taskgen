@@ -9,7 +9,7 @@ import calfem.mesh as cfm
 import calfem.utils as cfu
 import numpy as np
 
-from config import BASE_DIR
+from .config import results_dir
 
 
 def solve_plane2d(coords, dofs, edofs, bdofs, material_data, boundary_conditions, forces):
@@ -296,11 +296,10 @@ def load_plane2d_configuration(properties: dict, plane_version: str, mode: str):
 def save_plane2d_input_and_results(simulation_data, data_to_save):
     data_to_save["a"] = list(itertools.chain(*data_to_save["a"]))
     mode, plane2d_version, simulation_index = simulation_data
-    results_dir = os.path.join(BASE_DIR, "data", "results")
-    os.makedirs(results_dir, exist_ok=True)
+    os.makedirs(results_dir(), exist_ok=True)
 
     results_filename = "_".join([mode, plane2d_version, str(simulation_index), "results"]) + ".json"
-    results_path = os.path.join(results_dir, results_filename)
+    results_path = os.path.join(results_dir(), results_filename)
 
     with open(results_path, "w", encoding="utf-8") as f_out:
         json.dump(data_to_save, f_out, indent=2)

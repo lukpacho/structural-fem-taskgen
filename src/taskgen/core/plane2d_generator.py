@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from src.solver.plane2d_solver import load_plane2d_configuration
+from .plane2d_solver import load_plane2d_configuration
 
 
 def scale_plane_points(

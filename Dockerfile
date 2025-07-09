@@ -1,9 +1,9 @@
 # ---------- Stage 0 : build image -----------------------------------
 FROM python:3.11-slim AS builder
 
-WORKDIR /app
+WORKDIR /build
 
-# ----- 1️⃣ OS layer: TeX only --------------------------------------
+# 1. OS layer – TeX
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
@@ -14,23 +14,30 @@ RUN apt-get update -y && \
         make \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# ----- 2️⃣ Python deps ---------------------------------------------
-COPY requirements.txt .
-RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install -r requirements.txt
+# 2. Copy sources and build wheel
+COPY pyproject.toml requirements.txt README.md .
+COPY src/ src/
+COPY templates/ templates/
+COPY data/ data/
 
-# ----- 3️⃣ Project source ------------------------------------------
-COPY . .
+RUN pip install build && \
+    python -m build --wheel --outdir /dist
 
 # ---------- Stage 1 : runtime image --------------------------------
 FROM python:3.11-slim
 
-# copy the virtual-env from the builder
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# 1. Install the wheel produced in stage 0
+COPY --from=builder /dist/*.whl /tmp/
+RUN pip install /tmp/*.whl && rm -rf /tmp/*.whl
 
-WORKDIR /app
-COPY --from=builder /app .
+# 2. TeX runtime deps
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --no-install-recommends \
+        texlive-latex-base texlive-luatex texlive-fonts-recommended \
+        ghostscript && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["python", "-m", "taskgen.cli"]
+# 3. Entrypoint
+ENTRYPOINT ["taskgen"]
+CMD ["--help"]
