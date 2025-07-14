@@ -25,7 +25,9 @@ jobs:
           cache: 'pip'
 
       # 3) Install system libraries gmsh needs
-      - run: sudo apt-get update -y && sudo apt-get install -y libglu1-mesa
+      - run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libglu1-mesa
 
       # 4) Install project + dev tools
       - run: |
@@ -64,6 +66,11 @@ jobs:
         run: |
           pip install build
           python -m build --wheel
+
+      - name: Install system libs required by gmsh
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libglu1-mesa
 
       # ---- 1) Verify wheel sanity
       - name: Install & pip-check wheel

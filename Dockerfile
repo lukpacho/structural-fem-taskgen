@@ -28,12 +28,15 @@ FROM python:3.11-slim
 COPY --from=builder /dist/*.whl /tmp/
 RUN pip install /tmp/*.whl && rm -rf /tmp/*.whl
 
-# 2. TeX runtime deps
+# 2. TeX & gmesh runtime deps
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-        texlive-latex-base texlive-luatex texlive-fonts-recommended \
-        ghostscript && \
+        texlive-latex-base \
+        texlive-luatex \
+        texlive-fonts-recommended \
+        ghostscript \
+        libglu1-mesa && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 3. Entrypoint
