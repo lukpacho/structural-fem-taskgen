@@ -36,7 +36,7 @@ RUN apt-get update -y && \
         texlive-luatex \
         texlive-fonts-recommended \
         ghostscript \
-        libgl1-mesa-glx \
+        libgl1 \
         libglu1-mesa && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

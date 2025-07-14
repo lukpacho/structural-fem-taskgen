@@ -27,7 +27,7 @@ jobs:
       # 3) Install system libraries gmsh needs
       - run: |
           sudo apt-get update -y
-          sudo apt-get install -y libglu1-mesa libgl1-mesa-glx
+          sudo apt-get install -y libgl1 libglu1-mesa
 
       # 4) Install project + dev tools
       - run: |
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: write, packages: write, id-token: write }
     env:
-      PYPI_TARGET: ${{ vars.PYPI_target || 'test'}}
+      PYPI_TARGET: ${{ vars.PYPI_TARGET || 'test'}}
 
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
       - name: Install system libs required by gmsh
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libglu1-mesa libgl1-mesa-glx
+          sudo apt-get install -y libgl1 libglu1-mesa
 
       # ---- 1) Verify wheel sanity
       - name: Install & pip-check wheel
@@ -89,7 +89,7 @@ jobs:
           pip install twine
           twine upload --repository testpypi dist/*.whl
 
-       # ---- 2) Publish to PyPI if 'prod'
+      # ---- 2) Publish to PyPI if 'prod'
       - name: Publish to **PyPI**
         if: env.PYPI_TARGET == 'prod'
         env:
