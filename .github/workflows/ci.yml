@@ -27,7 +27,7 @@ jobs:
       # 3) Install system libraries gmsh needs
       - run: |
           sudo apt-get update -y
-          sudo apt-get install -y libglu1-mesa
+          sudo apt-get install -y libglu1-mesa libgl1-mesa-glx
 
       # 4) Install project + dev tools
       - run: |
@@ -70,7 +70,7 @@ jobs:
       - name: Install system libs required by gmsh
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libglu1-mesa
+          sudo apt-get install -y libglu1-mesa libgl1-mesa-glx
 
       # ---- 1) Verify wheel sanity
       - name: Install & pip-check wheel
