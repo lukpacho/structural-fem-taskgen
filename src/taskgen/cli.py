@@ -1,11 +1,13 @@
 ### cli.py
+from __future__ import annotations
+
 from pathlib import Path
 from typing import List
 
 import typer
 
-from taskgen.core import orchestrator_adapter as core
 from taskgen.core.config import DEFAULT_OUT_ROOT, set_output_root
+from taskgen.core.orchestrator_adapter import run_beam, run_plane2d
 
 app = typer.Typer(
     add_completion=False,
@@ -14,11 +16,11 @@ app = typer.Typer(
 
 
 @app.callback()
-def cli(
+def root_options(
     out_root: Path = typer.Option(
         DEFAULT_OUT_ROOT, "--out-root", "-o", help="Root directory for output files."
     )
-):
+) -> None:
     set_output_root(out_root)
 
 
@@ -36,7 +38,7 @@ def beam(
         None,
         "--beam-version",
         "-v",
-        help="Beam version(s). Repeat flag, e.g.  -v 2 -v 3",
+        help="Beam version(s). Repeatable flag, e.g.  -v 2 -v 3",
     ),
     num: int = typer.Option(
         1,
@@ -52,7 +54,7 @@ def beam(
 ):
     """Generate / solve beam problems."""
     versions = beam_version or [999]
-    core.run_beam(mode, versions, num, generate_pdf=not no_pdf)
+    run_beam(mode, versions, num, generate_pdf=not no_pdf)
 
 
 # ----------------------------------------------------------------------
@@ -69,7 +71,7 @@ def plane2d(
         None,
         "--plane2d-version",
         "-v",
-        help="Plane2D version(s). Repeat flag, e.g.  -v 2 -v 3",
+        help="Plane2D version(s). Repeatable flag, e.g.  -v 2 -v 3",
     ),
     num: int = typer.Option(
         1,
@@ -85,7 +87,7 @@ def plane2d(
 ):
     """Generate / solve PLANE-2D frame problems."""
     versions = plane2d_version or [999]
-    core.run_plane2d(mode, versions, num, generate_pdf=not no_pdf)
+    run_plane2d(mode, versions, num, generate_pdf=not no_pdf)
 
 
 if __name__ == "__main__":

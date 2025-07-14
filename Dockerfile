@@ -28,7 +28,7 @@ FROM python:3.11-slim
 COPY --from=builder /dist/*.whl /tmp/
 RUN pip install /tmp/*.whl && rm -rf /tmp/*.whl
 
-# 2. TeX & gmesh runtime deps
+# 2. TeX & gmesh (no GUI) runtime deps
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
@@ -36,8 +36,7 @@ RUN apt-get update -y && \
         texlive-luatex \
         texlive-fonts-recommended \
         ghostscript \
-        libgl1 \
-        libglu1-mesa && \
+        libgl1 libglu1-mesa && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 3. Entrypoint

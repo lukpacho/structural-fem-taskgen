@@ -8,8 +8,8 @@ from pathlib import Path
 from platformdirs import user_cache_dir
 
 # ── Configs
-CM_TO_IN: float = 1 / 2.54  # centimetres → inches
-M_TO_CM: float = 100.0  # metres → centimetres
+CM_TO_IN: float = 1 / 2.54  # centimetres -> inches
+M_TO_CM: float = 100.0  # metres -> centimetres
 ANNOTATION_DISPLACEMENT_MIN = 0.01  # m
 ANNOTATION_THRESHOLD = 0.01  # unitless
 
@@ -29,28 +29,26 @@ def load_properties() -> dict:
 
 # ── Writable directories
 # Default root in user cache (e.g., ~/.cache/taskgen)
-_OUTPUT_ROOT = Path(user_cache_dir("taskgen"))
-for sub in ("temp", "pdfs", "results"):
-    (_OUTPUT_ROOT / sub).mkdir(parents=True, exist_ok=True)
-
-DEFAULT_OUT_ROOT = _OUTPUT_ROOT
+DEFAULT_OUT_ROOT = Path(user_cache_dir("taskgen"))
+for _sub in ("temp", "pdfs", "results"):
+    (DEFAULT_OUT_ROOT / _sub).mkdir(parents=True, exist_ok=True)
 
 
 def set_output_root(root: Path) -> None:
     """Call from CLI if the user supplies --out-root."""
-    global _OUTPUT_ROOT
-    _OUTPUT_ROOT = root
-    for sub in ("temp", "pdfs", "results"):
-        (root / sub).mkdir(parents=True, exist_ok=True)
+    global DEFAULT_OUT_ROOT
+    DEFAULT_OUT_ROOT = root
+    for _sub in ("temp", "pdfs", "results"):
+        (root / _sub).mkdir(parents=True, exist_ok=True)
 
 
 def temp_dir() -> Path:
-    return _OUTPUT_ROOT / "temp"
+    return DEFAULT_OUT_ROOT / "temp"
 
 
 def pdfs_dir() -> Path:
-    return _OUTPUT_ROOT / "pdfs"
+    return DEFAULT_OUT_ROOT / "pdfs"
 
 
 def results_dir() -> Path:
-    return _OUTPUT_ROOT / "results"
+    return DEFAULT_OUT_ROOT / "results"
