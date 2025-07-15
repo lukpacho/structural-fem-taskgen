@@ -1,3 +1,4 @@
+# beam_plotter.py
 import os
 
 import matplotlib.pyplot as plt

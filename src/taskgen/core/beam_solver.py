@@ -1,3 +1,4 @@
+# beam_solver.py
 import numpy as np
 from calfem.core import assem, beam2e, beam2s, coordxtr, extract_ed, solveq
 

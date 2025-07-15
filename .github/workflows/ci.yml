@@ -27,7 +27,10 @@ jobs:
       # 3) Install system libraries gmsh needs
       - run: |
           sudo apt-get update -y
-          sudo apt-get install -y libgl1 libglu1-mesa
+          sudo apt-get install -y \
+          libfontconfig1 libgl1 libglu1-mesa libxcursor1 \
+          libxft2 libxrender1 libxi6 libxrandr2 libxinerama1 \
+          libgomp1 ghostscript libgraphite2-3 libharfbuzz0b
 
       # 4) Install project + dev tools
       - run: |
@@ -70,7 +73,10 @@ jobs:
       - name: Install system libs required by gmsh
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libgl1 libglu1-mesa
+          sudo apt-get install -y \
+          libfontconfig1 libgl1 libglu1-mesa libxcursor1 \
+          libxft2 libxrender1 libxi6 libxrandr2 libxinerama1 \
+          libgomp1 ghostscript libgraphite2-3 libharfbuzz0b
 
       # ---- 1) Verify wheel sanity
       - name: Install & pip-check wheel

@@ -1,14 +1,30 @@
+# description_pdf_generator.py
 import os
 import random
 import re
 import shutil
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
 from .config import TEMPLATES_DIR, pdfs_dir, temp_dir
 from .plane2d_plotter import plot_predefined_mesh
+
+
+def _tex_path(name: str | Path) -> Path:
+    """
+    Return the full <temp>/name.tex path.
+    • If *name* is an absolute/relative path that already ends with '.tex'
+      we assume the caller knew what they were doing and use it verbatim.
+    • Otherwise we treat *name* as a bare stem and build
+      <temp_dir()>/<name>.tex
+    """
+    p = Path(name)
+    if p.suffix == ".tex" or p.is_absolute():
+        return p
+    return temp_dir() / f"{p}.tex"
 
 
 def latex_jinja_env() -> Environment:
@@ -36,32 +52,25 @@ def render_latex_template(template_file, output_name, data):
     template_env = latex_jinja_env()
     template = template_env.get_template(template_file)
 
-    output_text = template.render(data)
-    with open(os.path.join(temp_dir(), f"{output_name}.tex"), "w", encoding="utf-8") as text_file:
-        text_file.write(output_text)
+    tex_file = _tex_path(output_name)
+    tex_file.parent.mkdir(parents=True, exist_ok=True)
+    tex_file.write_text(template.render(data), encoding="utf-8")
 
 
 def compile_latex_to_pdf(output_name):
     """
-    Compiles the LaTeX file to PDF using lualatex and manages the output.
+    Compiles the LaTeX file to PDF using tectonic and manages the output.
     :param output_name: The base name of the tex file without extension.
     """
+    tex_file = _tex_path(output_name)
     subprocess.run(
-        [
-            "lualatex",
-            "--shell-escape",
-            "--enable-write18",
-            f"--output-directory={temp_dir()}",
-            f"{output_name}.tex",
-        ],
+        ["tectonic", "-Z", "shell-escape", f"--outdir={temp_dir()}", str(tex_file)],
         check=True,
     )
 
-    pdf_file = f"{output_name}.pdf"
-    tex_file = f"{output_name}.tex"
-
-    shutil.move(os.path.join(temp_dir(), pdf_file), os.path.join(pdfs_dir(), pdf_file))
-    shutil.move(os.path.join(temp_dir(), tex_file), os.path.join(pdfs_dir(), tex_file))
+    pdf_file = tex_file.with_suffix(".pdf")
+    shutil.move(pdf_file, pdfs_dir() / pdf_file.name)
+    shutil.move(tex_file, pdfs_dir() / tex_file.name)
 
     for file in os.listdir(temp_dir()):
         os.remove(os.path.join(temp_dir(), file))

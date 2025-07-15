@@ -1,4 +1,4 @@
-### plane2d_plotter.py
+# plane2d_plotter.py
 import os
 
 # CalFEM for Python
@@ -13,9 +13,14 @@ from matplotlib.path import Path
 
 from .config import CM_TO_IN, results_dir, temp_dir
 
-# Set global font properties: Times New Roman, size 10.
-mpl.rcParams["font.family"] = "Times New Roman"
-mpl.rcParams["font.size"] = 10
+# Set global font properties:
+mpl.rcParams.update(
+    {
+        "font.family": "serif",
+        "font.serif": ["Liberation Serif", "Nimbus Roman", "Times New Roman"],
+        "font.size": 10,
+    }
+)
 
 
 def plot_plane2d_stresses(
@@ -188,7 +193,7 @@ def draw_node_numbers(ax, coords, shape_path, font_size=10, color="black"):
         (+base_offset_x_pts, +base_offset_y_pts),  # bottom-right
     ]
 
-    fontdict = {"family": "Times New Roman", "size": font_size, "color": color}
+    fontdict = {"family": "serif", "size": font_size, "color": color}
 
     text_objects = []
     legend_texts = ["Współrzędne:"]
@@ -264,7 +269,7 @@ def draw_element_numbers(ax, ex, ey, font_size=10, color="black"):
     rect_width_pts = 11.5
     rect_height_pts = 11.0
 
-    fontdict = {"family": "Times New Roman", "size": font_size, "color": color}
+    fontdict = {"family": "serif", "size": font_size, "color": color}
 
     text_objects = []
     for i in range(ex.shape[0]):

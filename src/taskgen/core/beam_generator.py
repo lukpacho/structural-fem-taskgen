@@ -1,3 +1,4 @@
+# beam_generator.py
 import json
 import os
 import random
