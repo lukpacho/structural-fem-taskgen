@@ -2,23 +2,18 @@
 from __future__ import annotations
 
 import sys
-from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import List
 
 import typer
 
+from taskgen import __version__
 from taskgen.core.config import DEFAULT_OUT_ROOT, set_output_root
 from taskgen.core.orchestrator_adapter import run_beam, run_plane2d
 
-if sys.version_info < (3, 10):
-    sys.stderr.write("structural-fem-taskgen-cli requires Python ≥ 3.10\n")
+if sys.version_info < (3, 11):
+    sys.stderr.write("structural-fem-taskgen-cli requires Python ≥ 3.11\n")
     sys.exit(1)
-
-try:
-    __version__ = version("structural-fem-taskgen-cli")
-except PackageNotFoundError:
-    __version__ = "0.0.0.dev0"
 
 app = typer.Typer(
     add_completion=False,

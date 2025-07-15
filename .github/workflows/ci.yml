@@ -65,10 +65,10 @@ jobs:
         with: { python-version: '3.11', cache: 'pip' }
 
       # ---------- Build wheel -------------------------------------------------
-      - name: Build wheel
+      - name: Build wheel & sdist
         run: |
           pip install build
-          python -m build --wheel
+          python -m build --wheel --sdist
 
       - name: Install system libs required by gmsh
         run: |
@@ -93,7 +93,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           pip install twine
-          twine upload --repository testpypi dist/*.whl
+          twine upload --repository testpypi --skip-existing dist/*.whl
 
       # ---- 2) Publish to PyPI if 'prod'
       - name: Publish to **PyPI**
@@ -103,7 +103,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           pip install twine
-          twine upload dist/*.whl
+          twine upload --skip-existing dist/*.whl
 
       # ---------- Build & push Docker images ---------------------------------
       - uses: docker/setup-buildx-action@v3
