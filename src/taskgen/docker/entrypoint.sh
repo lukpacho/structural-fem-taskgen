@@ -7,6 +7,28 @@ OUT_DIR=/out
 HOST_UID=${HOST_UID:-1000}
 HOST_GID=${HOST_GID:-1000}
 
+# ── 0.  Decide whether we really need /out directory ───────────────────────
+cmd=${2:-}            # identify the first meaningful flag/sub-command
+if [[ "$cmd" == "--out-root" || "$cmd" == "-o" ]]; then
+    cmd=${4:-}
+fi
+
+case "$cmd" in
+  # Pure information request -> skip all the /out logic
+  ""|--help|-h|--version|-V)  exec "$@" ;;
+  # The regular generation of PDFs, hence, /out needed and we need to fall through
+  beam|plane2d)  ;;
+  # Any other sub-command skips /out handling by default
+  *)  exec "$@" ;;
+esac
+
+# From here on we *require* that /out exists and is writable
+if [ ! -d "$OUT_DIR" ]; then
+    echo "[entrypoint] error: /out is missing."
+    echo "           run the container with:   -v \"\$PWD/out:/out\""
+    exit 1
+fi
+
 # ── 1. make /out writable by the caller ───────────────────────────────────
 cur_uid=$(stat -c %u "${OUT_DIR}" || echo 0)
 cur_gid=$(stat -c %g "${OUT_DIR}" || echo 0)

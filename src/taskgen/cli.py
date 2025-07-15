@@ -1,6 +1,8 @@
 # cli.py
 from __future__ import annotations
 
+import sys
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import List
 
@@ -9,18 +11,35 @@ import typer
 from taskgen.core.config import DEFAULT_OUT_ROOT, set_output_root
 from taskgen.core.orchestrator_adapter import run_beam, run_plane2d
 
+if sys.version_info < (3, 10):
+    sys.stderr.write("structural-fem-taskgen-cli requires Python ≥ 3.10\n")
+    sys.exit(1)
+
+try:
+    __version__ = version("structural-fem-taskgen-cli")
+except PackageNotFoundError:
+    __version__ = "0.0.0.dev0"
+
 app = typer.Typer(
     add_completion=False,
     help="Generate & solve structural FEM tasks (beam / plane2d).",
 )
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def root_options(
+    _ctx: typer.Context,
     out_root: Path = typer.Option(
         DEFAULT_OUT_ROOT, "--out-root", "-o", help="Root directory for output files."
-    )
+    ),
+    show_version: bool = typer.Option(
+        False, "--version", "-V", help="Show version and exit.", is_eager=True
+    ),
 ) -> None:
+    if show_version:
+        typer.echo(f"structural-fem-taskgen-cli v{__version__}")
+        raise typer.Exit()
+
     set_output_root(out_root)
 
 
