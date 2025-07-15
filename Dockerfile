@@ -5,7 +5,7 @@ FROM python:3.11-slim AS builder
 WORKDIR /build
 
 # Copy sources and build wheel
-COPY pyproject.toml requirements.txt README.md ./
+COPY pyproject.toml LICENSE README.md ./
 COPY src/ src/
 
 RUN pip install --no-cache-dir build \
@@ -19,7 +19,7 @@ RUN set -eux; \
     apt-get update -y; \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
-        ca-certificates curl gosu \
+        ca-certificates curl gosu adduser \
         libfontconfig1 libgl1 libglu1-mesa libxcursor1 \
         libxft2 libxrender1 libxi6 libxrandr2 libxinerama1 \
         libgomp1 ghostscript libgraphite2-3 libharfbuzz0b \
