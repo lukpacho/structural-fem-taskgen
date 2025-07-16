@@ -17,7 +17,6 @@ Powered by **NumPy**, **CALFEM**, **gmsh** & **Tectonic**; wrapped in a single T
 * Linux (x86-64). Tested on Ubuntu 22.04/24.04 & WSL2.
 * Tectonic ≥ 0.15 for local PDF generation  
 `curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net \| sh`
-* [Tectonic install instructions](`https://tectonic-typesetting.github.io/book/latest/installation`)
 
 
 ## Install
