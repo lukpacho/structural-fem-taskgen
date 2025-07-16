@@ -1,0 +1,24 @@
+# Git
+.git
+.gitmodules
+.github
+
+# Test / CI artifacts
+tests
+.coverage
+htmlcov
+.mypy_cache
+.pytest_cache
+/.ruff_cache
+
+# Local builds & wheels
+dist
+build
+*.egg-info
+__pycache__
+
+# Misc
+*.log
+*.cfg
+*.ini
+.DS_Store

@@ -1,20 +1,30 @@
 # Dockerfile
 # ---------- Stage 0 : build image -----------------------------------
-FROM python:3.11-slim AS builder
-
+FROM python:3.12-slim AS builder
 WORKDIR /build
 
-# Copy sources and build wheel
-COPY pyproject.toml LICENSE README.md ./
+# Copy only metadata first
+COPY pyproject.toml README.md LICENSE ./
+
+# Install build tooling
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python -m pip install --upgrade pip \
+    && pip install --upgrade build hatchling
+
+# Copy the actual sources
 COPY src/ src/
 
-RUN pip install --no-cache-dir build \
-  && python -m build --wheel --outdir /dist
+# Build wheel and install it into a temporary venv
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python -m build --wheel -o /tmp/dist \
+ && pip install /tmp/dist/*.whl \
+ && rm -rf /tmp/dist
+
 
 # ---------- Stage 1 : runtime image --------------------------------
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# --- system libs, gmesh deps and gosu
+# Install system libs, gmesh deps and gosu
 RUN set -eux; \
     apt-get update -y; \
     DEBIAN_FRONTEND=noninteractive \
@@ -25,7 +35,7 @@ RUN set -eux; \
         libgomp1 ghostscript libgraphite2-3 libharfbuzz0b \
     && rm -rf /var/lib/apt/lists/*
 
-# --- install Tectonic
+# Install Tectonic
 ARG TECTONIC_SHA256="875fbbc9ab48560d7776088c608e0beee49197b57ab4a2f6c5385b2c661c842f"
 RUN set -eux; \
     curl -L -o /tmp/tectonic.tar.gz \
@@ -36,16 +46,15 @@ RUN set -eux; \
     install -m 0755 /tmp/tectonic/tectonic /usr/local/bin/; \
     rm -rf /tmp/tectonic /tmp/tectonic.tar.gz
 
-# --- install wheel
-COPY --from=builder /dist/*.whl /tmp/
-RUN pip install --no-cache-dir /tmp/*.whl && rm -rf /tmp/*.whl
+# Copy wheel from builder stage
+COPY --from=builder /usr/local /usr/local
 
 # head-less matplotlib
 ENV MPLBACKEND=Agg
 
-# 3. Entrypoint
+# Entrypoint
 COPY src/taskgen/docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh", "taskgen"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["--help"]

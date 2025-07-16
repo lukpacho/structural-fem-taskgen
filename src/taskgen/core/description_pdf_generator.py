@@ -22,9 +22,9 @@ def _tex_path(name: str | Path) -> Path:
       <temp_dir()>/<name>.tex
     """
     p = Path(name)
-    if p.suffix == ".tex" or p.is_absolute():
-        return p
-    return temp_dir() / f"{p}.tex"
+    if not p.suffix == ".tex":
+        p = p.with_suffix(".tex")
+    return p if p.is_absolute() else temp_dir() / p.name
 
 
 def latex_jinja_env() -> Environment:
@@ -63,17 +63,21 @@ def compile_latex_to_pdf(output_name):
     :param output_name: The base name of the tex file without extension.
     """
     tex_file = _tex_path(output_name)
+    workdir = temp_dir()
+    workdir.mkdir(parents=True, exist_ok=True)
+    abs_workdir = workdir.absolute()
     subprocess.run(
-        ["tectonic", "-Z", "shell-escape", f"--outdir={temp_dir()}", str(tex_file)],
+        ["tectonic", "-Z", "shell-escape", "--outdir=.", tex_file.name],
         check=True,
+        cwd=abs_workdir,
     )
 
-    pdf_file = tex_file.with_suffix(".pdf")
+    pdf_file = workdir / tex_file.with_suffix(".pdf").name
     shutil.move(pdf_file, pdfs_dir() / pdf_file.name)
     shutil.move(tex_file, pdfs_dir() / tex_file.name)
 
-    for file in os.listdir(temp_dir()):
-        os.remove(os.path.join(temp_dir(), file))
+    for f in workdir.iterdir():
+        f.unlink()
 
 
 def generate_description_pdf(template_file, output_name, data):
