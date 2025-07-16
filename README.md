@@ -1,5 +1,5 @@
 [![CI](https://github.com/lukpacho/structural-fem-taskgen/actions/workflows/ci.yml/badge.svg)](https://github.com/lukpacho/structural-fem-taskgen/actions/workflows/ci.yml)
-[![PyPI – latest](https://img.shields.io/pypi/v/structural_fem_taskgen_cli.svg)](https://pypi.org/project/structural-fem-taskgen-cli/)
+[![PyPI – latest](https://img.shields.io/pypi/v/structural-fem-taskgen-cli.svg)](https://pypi.org/project/structural-fem-taskgen-cli/)
 [![Test PyPI](https://img.shields.io/badge/Test%20PyPI-β-lightgrey)](https://test.pypi.org/project/structural-fem-taskgen-cli/)
 [![Docker pulls](https://img.shields.io/docker/pulls/lukpacho/taskgen)](https://hub.docker.com/r/lukpacho/taskgen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -14,9 +14,11 @@ with CalFEM and produce:
 Powered by **NumPy**, **CALFEM**, **gmsh** & **Tectonic**; wrapped in a single Typer CLI and container image.
 
 ## Requires
-- for local runs requires Tectonic 0.15.0 installed
-  - As in `https://tectonic-typesetting.github.io/book/latest/installation` you can install using `curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net |sh`
-- Docker image comes with shipped Tectonic 0.15.0
+* Linux (x86-64). Tested on Ubuntu 22.04/24.04 & WSL2.
+* Tectonic ≥ 0.15 for local PDF generation  
+`curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net \| sh`
+* [Tectonic install instructions](`https://tectonic-typesetting.github.io/book/latest/installation`)
+
 
 ## Install
 
