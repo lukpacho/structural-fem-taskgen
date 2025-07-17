@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "structural-fem-taskgen-cli"
-version = "0.1.6"
+version = "0.1.7"
 description = "Structural FEM task generator and solver"
 readme = "README.md"
 requires-python = ">=3.11"

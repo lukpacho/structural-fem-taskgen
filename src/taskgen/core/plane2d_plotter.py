@@ -353,8 +353,8 @@ def plot_predefined_mesh(coords, dofs, edofs, mesh_props, simulation_data):
     # Save with bbox_inches='tight' to remove extra page margin
     plane2d_version, simulation_index, plot_type = simulation_data
     plot_filename = f"{plane2d_version}_{simulation_index}_{plot_type}.pdf"
-    plot_path = os.path.join(temp_dir(), plot_filename)
-    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+    plot_path: Path = temp_dir().absolute() / plot_filename
+    plot_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(plot_path, format="pdf", bbox_inches="tight")
     plt.close(fig)
     return plot_path
