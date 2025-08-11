@@ -1,0 +1,92 @@
+% plane2d_template.tex
+\documentclass[a4paper,10pt]{article}
+\usepackage[left=20mm,right=20mm,top=25mm,bottom=25mm,bindingoffset=0mm]{geometry}
+\usepackage{fontspec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage[detect-all=true]{siunitx}
+\usepackage{stanli}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{calc}
+\usepackage{xcolor}
+\usepackage{adjustbox}
+\usepackage{enumitem} 
+
+
+\pagestyle{fancy}
+\fancyhead[L]{\small Katedra Wytrzymałości Materiałów, WILiŚ, PG}
+\fancyhead[R]{\small rok. akad. 2025/2026}
+\fancyfoot[L]{\textcolor{gray}{\textit{Numer zadania (do informacji sprawdzającego): 482000}}}
+\fancyfoot[C]{}
+
+
+% Document
+\begin{document}
+
+\begin{center}
+    {\Large \textbf{Podstawy Mechaniki Komputerowej - Projekt}}
+    \end{center}
+
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{
+            m{.175\textwidth}m{.215\textwidth}m{.175\textwidth}m{.175\textwidth}m{.1\textwidth}}
+        \toprule
+        Imię & Nazwisko & Numer albumu & Numer grupy  & Ocena \\ \midrule
+             &          &              &              &       \\ \bottomrule
+        \end{tabular}
+        \label{tab:dane_studenta}
+    \end{table}
+
+    \noindent\textbf{Treść zadania:} \vspace{1mm}
+
+    \noindent Dla przedstawionego układu w \textbf{Płaskin Stanie Odkształcenia (PSO)} wyznaczyć:
+    \begin{itemize}
+        \item wartości \textbf{przemieszczeń poziomych} $(u_x)$ w węźle 7 oraz \textbf{pionowych} $(v_y)$ w węźle 8,
+        \item \textbf{maksymalną} \textbf{bezwzględną} wartość naprężeń normalnych $\mathrm{max}(|\sigma_x|)$ oraz ich \textbf{lokalizację}.
+    \end{itemize}
+
+    \noindent Zadanie należy rozwiązać stosując trójkątny element skończony (CST) dla: \textbf{A)} siatki przedstawionej na rysunku, \textbf{B)} siatki wygenerowanej automatycznie przy parametrze $H_{\mathrm{max}} = 0.36$\,$\si{m}$. \\
+    Konstrukcja ma grubość $t = 80$\,$\si{m}$ i wykonano ją z materiału o parametrach $E = 12$\,$\si{GPa}$ oraz $\nu = 0.25$. \\
+    Zadany układ podparty jest na krawędzi pomiędzy węzłami:
+        5 - 6 w obu kierunkach%
+,         10 - 1 w obu kierunkach%
+. 
+    Na układ działają obciążenia w postaci 
+ sił skupionych: 
+        $P_1 = 14400\,\si{kN}$ w węźle 3 na kierunku pionowym%
+,         $P_2 = 6400\,\si{kN}$ w węźle 9 na kierunku pionowym%
+. \newline
+
+    \noindent\textbf{Schemat układu} (wymiary w metrach):
+    
+    \includegraphics[width=\textwidth]{/media/lukpacho/Disk-1/OneDrivePG/PycharmProjects/structural-fem-taskgen/out/temp/plane2_0_mesh.pdf}\par
+
+    \noindent\textbf{Wymagane elementy opracowania:}
+
+    \begin{enumerate}
+    \item Skrypt do rozwiązania części \textbf{A)} \dotfill 10 pkt
+    \item Skrypt do rozwiązania części \textbf{B)} \dotfill 10 pkt
+    \item Wyniki przemieszczeń i naprężeń (w wybranych jednostkach) w tabeli poniżej oraz lokalizacje naprężeń oznaczone na rysunku (dla obu wariantów) \dotfill 5 pkt
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{@{}m{.02\textwidth} m{.15\textwidth} m{.15\textwidth} m{.2\textwidth} @{}}
+        \toprule
+         & $u_x$ [\dotfill] & $v_y$ [\dotfill] & $\mathrm{max}(|\sigma_x|)$ [\dotfill] \\ \midrule
+         \textbf{A)} & & & \\ \midrule
+         \textbf{B)} & & & \\ \bottomrule
+        \end{tabular}
+        \label{tab:rezultaty}
+    \end{table}
+    \end{enumerate}
+
+    \noindent\textbf{Uwagi:}
+    \begin{itemize}
+    \item W analizie numerycznej należy wykorzystać bibliotekę \textbf{CalFEM} w środowisku \textbf{MATLAB}.
+    \item Skrypty rozwiązujące zadanie należy przesłać do odpowiedniego modułu na platformie eNauczanie w ramach kursu \textit{Podstawy Mechaniki Komputerowej}.
+    \item Nieprzesłanie skryptów skutkuje przyznaniem 0 punktów za całe zadanie.
+    \end{itemize}
+
+\end{document}

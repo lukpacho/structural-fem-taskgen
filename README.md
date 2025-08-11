@@ -11,6 +11,8 @@ with CalFEM and produce:
 * PNG plots (internal forces, displacements, stresses)
 * JSON results for auto‑grading
 
+Example application output is provided in the **`examples`** folder.
+
 Powered by **NumPy**, **CALFEM**, **gmsh** & **Tectonic**; wrapped in a single Typer CLI and container image.
 
 ## Requires
@@ -45,6 +47,7 @@ Commands:
   plane2d  Generate / solve 2‑D plane (CST) problems
   
 Args: (see docs for beam/plan2d geometries)
+  MODE                    Simulation mode: "random" or "predefined"
   --beam-version (-v)     Available options: [1, 2, 3, 4, 5, 6, 7, 8, 999]
   --plane2d-version (-v)  Available options: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   --num (-n)              Number of simulations per beam/plane2d version
